@@ -1,0 +1,230 @@
+
+
+Setting up unity catalog or Data Governance layer
+-------------------------------------------------
+
+-It involves 2 step process
+
+1)1st step is done from the cloud provider i.e from Azure
+
+2)2nd step is done from Databricks workspace.
+
+We need to have atleast one Databricks workspace i.e premium
+
+-in standard workspace,lot of features are not available
+------------------------------------------------------------------------------
+Unity Catalog set up steps:
+
+1)Create a Databricks workspace(premium)--->myworkspaceadb8am
+
+2)Create Data Storage layer(physical layer) --->done from Azure side
+                                                physical data should be stored
+                                                in Azure cloud.
+    i)create Strorage Account---->mystorageadb8am
+   ii)Create Storage Container--->metastore8am-root
+  iii)Create Databricks Access connector-->databricks_access_connector8am
+   iv)Grant access to Access connector for accessing Azure Storage account
+
+3)Setup Unity Catalog Metastore---->done from Databricks workspace
+
+4)Setup users and permissions-->import users from Active directory and then
+                                setup permissions for the user
+
+==============================================================================
+step 2.1-->Create Strorage Account--->mystorageadb8am
+
+step 2.2-->Create Storage Container--->metastore8am-root (for unity catalog)
+           we created root directory(metastore8am-root) for unity catalog
+           where entire metada is stored.
+
+Step 2.3--->Create Databricks Access connector
+            This Access connector will have access to the strorage account     
+             and later assigning roles to it
+
+           access connector is similar to service principal to access the 
+           storage
+
+           here we need to create a connector which comes with 
+           security credentials to access the storage container
+
+Creating a access connector:
+---------------------------
+Goto Azure home page---> +Create a resource--->
+       ---->search:access connector for Azure Databricks--->create
+
+Resource group:adb6pm
+Instance details
+Name :databricks_access_connector6pm
+Region :East US
+        bcoz my databricks workspace is in EastUS
+        and my storage account also in EastUs
+
+Review+Create--->Create
+
+Goto resource-->adb6pm-->we see-->databricks_access_connector6pm-->click it
+
+copy the ResourceID--->/subscriptions/65350b18-9cdf-41e5-9918-7ec1b910a1da/resourceGroups/adb9am/providers/Microsoft.Databricks/accessConnectors/databricks_access_connector
+
+copy this ResourceId for later use
+
+-------------------------------------------------------------------------------
+step 2.4 Grant access to Access connector for accessing Azure Storage account
+ 
+This access connector is used for reading and writing data into storage account
+
+so we need to grant permission for that account
+
+Goto Azure Storage account-->
+mystoragelakeadb6pm--->Access Control(IAM)--->+add-->Add role Assignment-->
+--->search:Storage Blob data contributor-->select it---->next---->
+-->choose assign access to "managed Identity" radio button
+   previously storageaccount to DBFS-->we gave access to service principal
+   but now grant access to connector
+
+--->click-->+select members--->
+Subscription:Azure vijay1
+Managed identity: All system-assigned managed identities (9)
+Select-->databricks_access_connector6pm
+
+click--->select--->
+
+we see the following
+Name                           Object ID                          
+databricks_access_connector6pm 6fa1f2fc-eddc-45da-9dae-f1a011b3fe3a
+Type-->Access Connector for Azure Databricks
+
+Review+Assign---->twice
+
+Role Assignment added successfully
+
+for Azure side it is completed
+
+-------------------------------------------------------------------------------
+3)logging into Azure Databricks Account console
+ ----------------------------------------------
+-Due to recent changes of microsoft Azure(July 2024) onwards,
+ users with personal subscriotion excluding the bussiness subscriptions
+ are unable to access Azure Databricks Account console with their userids
+
+ open this--->https://accounts.azuredatabricks.net/
+
+           sign in with--->microsoft entraid--->enter username and password
+           It gives logging errors
+
+we have 2 solutions
+1)use the external user created by Azure to access the databricks account console
+   https://accounts.azuredatabricks.net/
+
+2)Create a new External user and use that to access the 
+  databricks account console
+
+===============================================================================
+1)use the external user created by Azure to access the databricks account console
+
+  -By default Azure creates an external user  for every subscription, that you
+   can use to access the databricks account console
+
+ Goto Azure home--->Microsoft EntraID---->users-->
+               ---->
+       1 user found (1 user selected)
+
+        Display name      principal name
+        N VIJAYA SAGAR   vijayhadooptrainings2_gmail.com#EXT#@vijayhadooptrainings2gmail.onmicrosoft.com--->copy this
+                         <--------copy this(shortcut available)--------------------------------->
+        
+signout from the azure portal and sign in using this External user
+
+portal.azure.com
+
+sign in: paste here
+password:reset the password
+
+use the external user to login to Azure databricks Account console
+
+https://accounts.azuredatabricks.net/
+
+-->signin with nicrosoft entra ID-->select the external user-->pwd:
+
+--->Databricks account console will open-->
+ in Databricks Account console, we see the following
+ 1.Workspaces
+ 2.catalog
+ 3.users and groups
+ 4.Cloud resources
+ 5.Settings
+
+The external user created by microsoft Azure already has the privilages-->
+Global Adminstrator and Databricks Account admin
+so you no need to add any additional privilages
+
+==============================================================================
+Solution2:Create a new external user and use that to access the databricks account console
+
+-we create a new external user in microsoft EntraID and assign 
+ Global Administrator role so that the new user can be used to signing to 
+ Azure Databricks account console
+
+Goto Azure home--->Microsoft EntraID-->Default Directory opens--->
+          -->users--->+New User(create New user)----->
+
+
+User principal name:databricks_admin@vijayhadooptrainings2gmail.onmicrosoft.com
+
+Mail nickname :databricks_admin6pm
+
+Display name :databricks_admin6pm
+Password :••••••••••••
+
+Review+Create--->Create
+
+It creates a new user
+
+Goto-->users
+
+2 users found
+
+  Display name          Principal name
+databricks_admin6pm    databricks_admin@vijayhadooptrainings2gmail.onmicrosoft.com
+
+N VIJAYA SAGAR    vijayhadooptrainings2_gmail.com#EXT#@vijayhadooptrainings2gmail.onmicrosoft.com
+
+
+click-->databricks_admin6pm--->Assign Global Administrator Role to the new user
+
+databricks_admin6pm-->Assigned roles(at left pane)--->Add Assignment--->
+ 
+ ar rigside-->search: Global Adminstrator-->select Global Adminstrator-->Add
+
+Role gets added
+It displays-->Global adminstrator
+
+
+Now signin using new user to Azure Databricks Account console
+
+https://accounts.azuredatabricks.net/--->
+
+Azure Databricks Account console opens
+
+
+
+
+ 
+
+      
+                       
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

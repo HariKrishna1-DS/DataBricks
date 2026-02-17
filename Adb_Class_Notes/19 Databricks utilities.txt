@@ -1,0 +1,124 @@
+
+Databricks Utilities:
+-----------------------
+1)Credentials utiltity
+2)data utility
+3)fs utility
+4)jobs utility
+5)library utility
+6)meta utility
+7)notebook utililty
+8)secrets utility
+9)widgets utility
+10)preview utility
+
+dbutils:
+-------
+   -dbutils is a package which provides many utils
+
+to display all the avialable utilities
+----------------------------
+dbutils.help()------------>This module provides various utilities for users
+                           to interact with the rest of Databricks.
+----------------------------
+
+1)credentials: DatabricksCredentialUtils ->
+          Utilities for interacting with credentials within notebooks
+
+2)data utility: To understand the datasets
+                It provides a method to calculate some statistics and 
+                gives you the summary
+      DataUtils->Utilities for understanding and interacting with datasets
+
+3)fs :file system utility
+       -provides methods to interact with filesystem
+    DbfsUtils -> Manipulates the Databricks filesystem (DBFS) from the console
+
+4)jobs utility: To interact with databricks workflow jobs
+       JobsUtils -> Utilities for leveraging jobs features
+
+5)library utility :
+   LibraryUtils---> allows you to locally compile an application
+
+6)meta utility
+  MetaUtils---> not for metadata purpose
+                provides methods for a compiler
+
+7)Notebook utility:To run chain of notebooks
+        NotebookUtils -> Utilities for the control flow of a notebook 
+
+8)preview : for hidden utilities under preview
+
+9)secrets utility : for accessing secure credentials from within the notebook
+      SecretUtils -> Provides utilities for leveraging secrets within notebooks
+
+10)widgets utility:
+    WidgetsUtils -->To create notebook parameters
+
+===============================================================================
+
+we can see the documentation of all these utilities using 2nd level help
+
+ex: list of methods for fs utility
+
+----------------------------
+dbutils.fs.help()  ----->displays all the methods for fs utility
+----------------------------
+
+we can also check documentation for a specific command
+----------------------------
+dbutils.fs.help("cp")
+----------------------------
+
+In this way-->we can get help for any databricks utility
+
+most commonly used utilities:
+-----------------------------
+1. File Sytem utility: It provides methods to perform dbfs operations
+                       such as cp,ls,head,mkdir,mv,rmdir etc
+
+ex:ls
+
+we can perform ls in 2 ways
+1.using magic command
+2.using dbutils
+
+1)using magic command
+--------------------------
+%fs
+ls /databricks-datasets   -->displays all the datasets
+-------------------------
+
+here i didnt use the dbutil package
+
+2)doing the same using--->dbutils package
+
+--------------------------------
+dbutils.fs.ls("/databricks-datasets")
+-------------------------------------
+
+The advantage of dbutils is--->
+dbutils.fs can be used in python code
+ex:
+------------------------------------------------------
+for foldername in dbutils.fs.ls("/databricks-datasets"):
+  print(foldername.path)
+------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+       
+
+  
+
+
+
+

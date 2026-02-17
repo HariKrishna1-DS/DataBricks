@@ -1,0 +1,1274 @@
+
+Different functions of Dataframe API
+------------------------------------
+
+Workspace--->ADBLab--->Create--->New--->Notebook-->DataframeAPI Functions
+
+----------------------------------------------------------------------------
+base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+df1 = spark.read.format("json").load(base_dir+"jsondata/emps.json")
+df1.show()
+---------------------------------------------------------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+
+Note: Transformation on a dataframe returns a Dataframe itself
+
+1)select(): To select or extract a particular column
+  
+ Task: Extract the enames
+------------------------------
+enames_df=emps_df.select('ename')
+enames_df.show()
+--------------------------------
+o/p:
++------+
+| ename|
++------+
+|Miller|
+| Blake|
+|  Sony|
+| Sonia|
+| James|
++------+
+
+==============================================================================
+2)Extract multiple columns
+
+Task: Extract only empnames and their salaries
+--------------------------------------
+df1=emps_df.select("ename","sal")
+df1.show()
+--------------------------------------
+o/p:
++------+-----+
+| ename|  sal|
++------+-----+
+|Miller|10000|
+| Blake|20000|
+|  Sony|30000|
+| Sonia|40000|
+| James|50000|
++------+-----+
+
+or
+------------------------------------
+emps_df.select("ename","sal").show()
+------------------------------------
+o/p:
+
++------+-----+
+| ename|  sal|
++------+-----+
+|Miller|10000|
+| Blake|20000|
+|  Sony|30000|
+| Sonia|40000|
+| James|50000|
++------+-----+
+=============================================================================
+3)Transformations
+  Adding 5000 to each employee salary as bonus
+
+-----------------------------------
+df2=df1.select("ename","sal"+5000)  --------->Invalid
+-----------------------------------
+
+whenever we want to perform Arithmetic operations with columns,
+we need to use the dataframe seperately to each column
+
+-----------------------------------------------------
+df2=df1.select(df1.ename,df1.sal+5000)
+df2.show()
+-----------------------------------------------------
+o/p:
++------+------------+
+| ename|(sal + 5000)|
++------+------------+
+|Miller|       15000|
+| Blake|       25000|
+|  Sony|       35000|
+| Sonia|       45000|
+| James|       55000|
++------+------------+
+or
+Providing alias name
+--------------------------------------------------------
+df2=df1.select(df1.ename,(df1.sal+5000).alias("totsal"))
+df2.show()
+--------------------------------------------------------
+or
+--------------------------------------------------------
+from pyspark.sql.functions import col
+df2=df1.select(col("ename"),(col("sal")+5000).alias("totsal"))
+df2.show()
+--------------------------------------------------------
+o/p:
++------+------+
+| ename|totsal|
++------+------+
+|Miller| 15000|
+| Blake| 25000|
+|  Sony| 35000|
+| Sonia| 45000|
+| James| 55000|
++------+------+
+===============================================================================
+4)selectExpr()
+
+----------------------------------------
+df1.selectExpr("ename","sal+5000").show()
+
+----------------------------------------
+o/p:
+
++------+------------+
+| ename|(sal + 5000)|
++------+------------+
+|Miller|       15000|
+| Blake|       25000|
+|  Sony|       35000|
+| Sonia|       45000|
+| James|       55000|
++------+------------+
+==============================================================================
+copying a dataframe into another dataframe
+----------------------
+df=emps_df
+df.show()
+----------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+==============================================================================
+5)filter(): For filtering data
+
+Task:Filter only those emps whose sal>25000
+
+----------------------------------------------------
+df3=df.filter(df.sal>25000)
+df3.show()
+----------------------------------------------------
+
+o/p:
++---+---+-----+-----+---+
+|dno|eid|ename|  sal|sex|
++---+---+-----+-----+---+
+| 11|103| Sony|30000|  f|
+| 12|104|Sonia|40000|  f|
+| 13|105|James|50000|  m|
++---+---+-----+-----+---+
+
+applying 3 functions--->filter(),select() and show()
+Task: print ename and salaries for those whose sal>25000
+
+-----------------------------------------------------
+df.filter(df.sal>25000).select(df.ename,df.sal).show()
+-----------------------------------------------------
+o/p:
++-----+-----+
+|ename|  sal|
++-----+-----+
+| Sony|30000|
+|Sonia|40000|
+|James|50000|
++-----+-----+
+==============================================================================
+Task: I want only those emps who belongs to dno 11
+
+-----------------------------------------------
+df4=df.filter(df.dno==11).select("ename","sal")
+df4.show()
+-----------------------------------------------
+output:
++------+-----+
+| ename|  sal|
++------+-----+
+|Miller|10000|
+|  Sony|30000|
++------+-----+
+==============================================================================
+6)collect()
+-------------------
+df1.collect()
+-------------------
+output: we get list of Row objects
+
+[Row(ename='Miller', sal=10000),
+ Row(ename='Blake', sal=20000),
+ Row(ename='Sony', sal=30000),
+ Row(ename='Sonia', sal=40000),
+ Row(ename='James', sal=50000)]
+
+==============================================================================
+7. count(): Returns the no of rows in a dataframe
+
+---------------
+df1.count()
+---------------
+o/p :5   i.e 5 elements
+
+==============================================================================
+8.columns :Returns column names as list
+
+------------------
+df.columns
+------------------
+o/p:
+['dno', 'eid', 'ename', 'sal', 'sex']
+===============================================================================
+9.printSchema()
+
+--------------------
+df.printSchema()
+--------------------
+o/p:
+root
+ |-- dno: long (nullable = true)
+ |-- eid: long (nullable = true)
+ |-- ename: string (nullable = true)
+ |-- sal: long (nullable = true)
+ |-- sex: string (nullable = true)
+
+==============================================================================
+10.describe()
+
+df.describe().show()
+o/p:
++-------+------------------+------------------+-----+------------------+----+
+|summary|               dno|               eid|ename|               sal| sex|
++-------+------------------+------------------+-----+------------------+----+
+|  count|                 5|                 5|    5|                 5|   5|
+|   mean|              11.8|             103.0| NULL|           30000.0|NULL|
+| stddev|0.8366600265340755|1.5811388300841898| NULL|15811.388300841896|NULL|
+|    min|                11|               101|Blake|             10000|   f|
+|    max|                13|               105| Sony|             50000|   m|
++-------+------------------+------------------+-----+------------------+----+
+
+performs diff aggregations on numerical columns
+==============================================================================
+11.distinct():returns a new DF containing distinct rows
+
+I want to know the no of deptnos
+I want to know the distinct dnos
+
+we cannot apply distict on a columnm
+we can apply only on df
+what all the functions can be applied only on df but not on columns
+---------------------------
+df5=df.select("dno")
+df5.show()
+---------------------------
+o/p:
++---+
+|dno|
++---+
+| 11|
+| 12|
+| 11|
+| 12|
+| 13|
++---+
+
+---------------------------------
+df5.distinct().show()
+---------------------------------
+
+o/p:
++---+
+|dno|
++---+
+| 12|
+| 11|
+| 13|
++---+
+#or
+I want distinct dno's
+
+---------------------------------
+df.select("dno").distinct().show()
+----------------------------------
+o/p:
++---+
+|dno|
++---+
+| 12|
+| 11|
+| 13|
++---+
+==============================================================================
+12)drop():drops a particular column
+----------------------
+df6=df.drop("sex")
+df6.show()
+----------------------
+o/p:
+
++---+---+------+-----+
+|dno|eid| ename|  sal|
++---+---+------+-----+
+| 11|101|Miller|10000|
+| 12|102| Blake|20000|
+| 11|103|  Sony|30000|
+| 12|104| Sonia|40000|
+| 13|105| James|50000|
++---+---+------+-----+
+===============================================================================
+we can also drop multiple columns at a time
+
+---------------------
+df7=df.drop("sex","dno")
+df7.show()
+-----------------------
+o/p:
++---+------+-----+
+|eid| ename|  sal|
++---+------+-----+
+|101|Miller|10000|
+|102| Blake|20000|
+|103|  Sony|30000|
+|104| Sonia|40000|
+|105| James|50000|
++---+------+-----+
+
+==============================================================================
+13)dropDuplicates: drop duplicates based on multiple columns
+
+------------------------
+df8=df.dropDuplicates(["dno","sex"])
+df8.show()
+------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|103|  Sony|30000|  f|
+| 11|101|Miller|10000|  m|
+| 12|104| Sonia|40000|  f|
+| 12|102| Blake|20000|  m|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+=============================================================================
+14) first(): returns the 1st row in the dataframe
+---------------------
+df.first()
+---------------------
+o/p:
+
+Row(dno=11, eid=101, ename='Miller', sal=10000, sex='m')
+============================================================================
+15)sort():
+
+------------------------
+df.sort(df.sal).show()
+------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+
+ex:2
+-------------------------------
+df.sort(df.sal.desc()).show()
+-------------------------------
+o/p:
+
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 13|105| James|50000|  m|
+| 12|104| Sonia|40000|  f|
+| 11|103|  Sony|30000|  f|
+| 12|102| Blake|20000|  m|
+| 11|101|Miller|10000|  m|
++---+---+------+-----+---+
+==============================================================================
+16)orderBy():
+---------------------------
+df.orderBy("ename").show()
+---------------------------
+o/p:
+
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 12|102| Blake|20000|  m|
+| 13|105| James|50000|  m|
+| 11|101|Miller|10000|  m|
+| 12|104| Sonia|40000|  f|
+| 11|103|  Sony|30000|  f|
++---+---+------+-----+---+
+
+#ex:
+---------------------------------
+df.orderBy(df.sal.desc()).show()
+---------------------------------
+o/p:
+
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 13|105| James|50000|  m|
+| 12|104| Sonia|40000|  f|
+| 11|103|  Sony|30000|  f|
+| 12|102| Blake|20000|  m|
+| 11|101|Miller|10000|  m|
++---+---+------+-----+---+
+
+=============================================================================
+17) getting the number of partitions
+-------------------------
+df.rdd.getNumPartitions()
+-------------------------
+o/p: 1
+=============================================================================
+18)repartition():
+---------------------
+df.repartition(5)
+---------------------
+
+---------------------------
+df.rdd.getNumPartitions()
+---------------------------
+o/p:
+5
+
+ii)repartition on a specified column:It will shuffle the data
+
+-------------------------
+df2=df.repartition("dno","sex")
+df2.show()
+---------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 12|104| Sonia|40000|  f|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 13|105| James|50000|  m|
+| 11|101|Miller|10000|  m|
++---+---+------+-----+---+
+
+=============================================================================
+19)replace():
+
+df2=df.replace(['m','f'],['male','female'],'sex')
+df2.show()
+
++---+---+------+-----+------+
+|dno|eid| ename|  sal|   sex|
++---+---+------+-----+------+
+| 11|101|Miller|10000|  male|
+| 12|102| Blake|20000|  male|
+| 11|103|  Sony|30000|female|
+| 12|104| Sonia|40000|female|
+| 13|105| James|50000|  male|
++---+---+------+-----+------+
+
+ex:2
+Task : 'Miller' and 'James" left the company,
+       replace them with new employees 'Ajay' and 'John'
+
+-----------------------------------------------------
+df2=df.replace(['Miller','James'],['Ajay','John'],'ename')
+df2.show()
+------------------------------------------------------
+o/p:
++---+---+-----+-----+---+
+|dno|eid|ename|  sal|sex|
++---+---+-----+-----+---+
+| 11|101| Ajay|10000|  m|
+| 12|102|Blake|20000|  m|
+| 11|103| Sony|30000|  f|
+| 12|104|Sonia|40000|  f|
+| 13|105| John|50000|  m|
++---+---+-----+-----+---+
+
+=============================================================================
+20) To change schema or the column names
+
+eid---->ecode
+sal---->income
+sex---->Gender
+
+---------------------------------------------------
+df2=df.toDF('dno','ecode','ename','income','gender')
+df2.show()
+----------------------------------------------------
+change as per the order of df columns
+o/p:
++---+-----+------+------+------+
+|dno|ecode| ename|income|gender|
++---+-----+------+------+------+
+| 11|  101|Miller| 10000|     m|
+| 12|  102| Blake| 20000|     m|
+| 11|  103|  Sony| 30000|     f|
+| 12|  104| Sonia| 40000|     f|
+| 13|  105| James| 50000|     m|
++---+-----+------+------+------+
+
+==========================================================================
+21)withColumRenamed(existing,new):Renaming a particular column
+
+---------------------------------------------
+df.withColumnRenamed("ename","empname").show()
+---------------------------------------------
++---+---+-------+-----+---+
+|dno|eid|empname|  sal|sex|
++---+---+-------+-----+---+
+| 11|101| Miller|10000|  m|
+| 12|102|  Blake|20000|  m|
+| 11|103|   Sony|30000|  f|
+| 12|104|  Sonia|40000|  f|
+| 13|105|  James|50000|  m|
++---+---+-------+-----+---+
+=============================================================================
+22)withColumn(): Adding a new Column(tax)
+
+deduct tax of 20%
+------------------------------------------
+df2=df.withColumn('tax',df.sal*0.20)
+df2.show()
+------------------------------------------
+o/p:
++---+---+------+-----+---+-------+
+|dno|eid| ename|  sal|sex|    tax|
++---+---+------+-----+---+-------+
+| 11|101|Miller|10000|  m| 2000.0|
+| 12|102| Blake|20000|  m| 4000.0|
+| 11|103|  Sony|30000|  f| 6000.0|
+| 12|104| Sonia|40000|  f| 8000.0|
+| 13|105| James|50000|  m|10000.0|
++---+---+------+-----+---+-------+
+
+ex:2
+Generate new column------>netsal
+------------------------------------------------
+df2.withColumn('netsal',df2.sal-df2.tax).show()
+------------------------------------------------
+o/p:
+
++---+---+------+-----+---+-------+-------+
+|dno|eid| ename|  sal|sex|    tax| netsal|
++---+---+------+-----+---+-------+-------+
+| 11|101|Miller|10000|  m| 2000.0| 8000.0|
+| 12|102| Blake|20000|  m| 4000.0|16000.0|
+| 11|103|  Sony|30000|  f| 6000.0|24000.0|
+| 12|104| Sonia|40000|  f| 8000.0|32000.0|
+| 13|105| James|50000|  m|10000.0|40000.0|
++---+---+------+-----+---+-------+-------+
+
+==============================================================================
+23) toJSON()
+
+--------------------------------
+df.toJSON().collect()
+--------------------------------
+o/p:
+['{"dno":11,"eid":101,"ename":"Miller","sal":10000,"sex":"m"}',
+ '{"dno":12,"eid":102,"ename":"Blake","sal":20000,"sex":"m"}',
+ '{"dno":11,"eid":103,"ename":"Sony","sal":30000,"sex":"f"}',
+ '{"dno":12,"eid":104,"ename":"Sonia","sal":40000,"sex":"f"}',
+ '{"dno":13,"eid":105,"ename":"James","sal":50000,"sex":"m"}']
+
+==============================================================================
+24)toLocalIterator(): returns local python iterator object such as list,tuple
+                      set,dict
+
+
+------------------------------------------------
+df.toLocalIterator()
+list1=list(df.toLocalIterator())
+print(list1)
+------------------------------------------------
+o/p:
+
+[Row(dno=11, eid=101, ename='Miller', sal=10000, sex='m'),
+ Row(dno=12, eid=102, ename='Blake', sal=20000, sex='m'), 
+ Row(dno=11, eid=103, ename='Sony', sal=30000, sex='f'), 
+ Row(dno=12, eid=104, ename='Sonia', sal=40000, sex='f'),
+ Row(dno=13, eid=105, ename='James', sal=50000, sex='m')]
+===============================================================================
+27)show():
+---------------
+df.show()
+---------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+
+ex:2
+----------------------
+df.show(truncate=False) --->shows the full contents of a Dataframe
+------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid|ename |sal  |sex|
++---+---+------+-----+---+
+|11 |101|Miller|10000|m  |
+|12 |102|Blake |20000|m  |
+|11 |103|Sony  |30000|f  |
+|12 |104|Sonia |40000|f  |
+|13 |105|James |50000|m  |
++---+---+------+-----+---+
+
+ex:3
+-------------------------
+df.show(3,truncate=False) ----->displays top3 rows and full column contents
+-------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid|ename |sal  |sex|
++---+---+------+-----+---+
+|11 |101|Miller|10000|m  |
+|12 |102|Blake |20000|m  |
+|11 |103|Sony  |30000|f  |
++---+---+------+-----+---+
+
+ex:4
+---------------------
+df.show(2,truncate=3) -->displays top 2 rows with 3 characters from each column
+---------------------
+o/p:
++---+---+-----+---+---+
+|dno|eid|ename|sal|sex|
++---+---+-----+---+---+
+| 11|101|  Mil|100|  m|
+| 12|102|  Bla|200|  m|
++---+---+-----+---+---+
+only showing top 2 rows
+
+ex:5
+-----------------------
+df.show(vertical=True)
+-----------------------
+o/p:
+-RECORD 0-------
+ dno   | 11     
+ eid   | 101    
+ ename | Miller 
+ sal   | 10000  
+ sex   | m      
+-RECORD 1-------
+ dno   | 12     
+ eid   | 102    
+ ename | Blake  
+ sal   | 20000  
+ sex   | m      
+-RECORD 2-------
+ dno   | 11     
+ eid   | 103    
+ ename | Sony   
+ sal   | 30000  
+ sex   | f      
+-RECORD 3-------
+ dno   | 12     
+ eid   | 104    
+ ename | Sonia  
+ sal   | 40000  
+ sex   | f      
+-RECORD 4-------
+ dno   | 13     
+ eid   | 105    
+ ename | James  
+ sal   | 50000  
+ sex   | m      
+==============================================================================
+df.head(5)---->displays the first 5 records
+df.tail(5)---->displays the last 5 records
+===================================================================================
+28)groupBy()
+Task:select sex,count(*) from emp group by sex
+
+o/p:
+ m---->count
+ f---->count
+--------------------------
+res1=df.groupBy("sex").count()
+res1.show()
+--------------------------
+o/p:
+
++---+-----+
+|sex|count|
++---+-----+
+|  m|    3|
+|  f|    2|
++---+-----+
+==============================================================================
+29) Aggregated functions:
+  i)agg()
+ ii)sum()
+iii)max()
+ iv)min()
+  v)avg()
+  vi)count()
+
+Case 1: Single grouping and single aggregation
+o/p:
+m---->count
+f---->count
+---------------------------------
+df.groupBy("sex").count().show()
+---------------------------------
+o/p:
++---+-----+
+|sex|count|
++---+-----+
+|  m|    3|
+|  f|    2|
++---+-----+
+-----------------------------------------------
+ii)sum aggregation
+o/p:
+
+m---->totsal
+f---->totsal
+-------------------------------------
+df.groupBy("sex").sum("sal").show()
+-------------------------------------
+o/p:
++---+--------+
+|sex|sum(sal)|
++---+--------+
+|  m|   80000|
+|  f|   70000|
++---+--------+
+----------------------------------------------------
+iii)avg()
+
+-------------------------------------------------
+df.groupBy("sex").avg("sal").show()
+--------------------------------------------------
+o/p:
++---+------------------+
+|sex|          avg(sal)|
++---+------------------+
+|  m|26666.666666666668|
+|  f|           35000.0|
++---+------------------+
+------------------------------------------------
+iv)max()
+------------------------------------
+df.groupBy("dno").max("sal").show()
+------------------------------------
+o/p:
++---+--------+
+|dno|max(sal)|
++---+--------+
+| 12|   40000|
+| 11|   30000|
+| 13|   50000|
++---+--------+
+-----------------------------------------
+v)min()
+
+----------------------------------------
+df.groupBy("dno").min("sal").show()
+-----------------------------------------
+o/p:
+
++---+--------+
+|dno|min(sal)|
++---+--------+
+| 12|   20000|
+| 11|   10000|
+| 13|   50000|
++---+--------+
+=============================================================================
+
+===============================================================================
+31)multi groupings:
+
+o/p:
+11 m totsal
+11 f totsal
+12 m totsal
+12 f   "
+13 m   "
+13 f   "
+-----------------------------------------
+df.groupBy("dno","sex").min("sal").show()
+-----------------------------------------
+o/p:
++---+---+--------+
+|dno|sex|min(sal)|
++---+---+--------+
+| 12|  f|   40000|
+| 12|  m|   20000|
+| 11|  f|   30000|
+| 13|  m|   50000|
+| 11|  m|   10000|
++---+---+--------+
+=============================================================================
+32)agg()--->Single/Multiple Aggregations
+
+i)Single aggregation
+--------------------------------------------------------
+from pyspark.sql.functions import *
+df.groupBy("dno").agg(sum("sal").alias("totsal")).show()
+---------------------------------------------------------
+o/p:
++---+------+
+|dno|totsal|
++---+------+
+| 12| 60000|
+| 11| 40000|
+| 13| 50000|
++---+------+
+
+ii)multiple Aggregations:
+-----------------------------------------------------------------------------
+df.groupBy("dno").agg(sum("sal").alias("totsal"),
+                      avg("sal").alias("avgsal"),
+                      max("sal").alias("maxsal"),
+                      min("sal").alias("minsal"),
+                      count("sal").alias("empcount")).show(truncate=False)
+------------------------------------------------------------------------------
+o/p:
++---+------+-------+------+------+--------+
+|dno|totsal|avgsal |maxsal|minsal|empcount|
++---+------+-------+------+------+--------+
+|12 |60000 |30000.0|40000 |20000 |2       |
+|11 |40000 |20000.0|30000 |10000 |2       |
+|13 |50000 |50000.0|50000 |50000 |1       |
++---+------+-------+------+------+--------+
+
+iii)where clause
+Task: I want those dnos whose totsal>=50000
+-------------------------------------------
+df.groupBy("dno").agg(sum("sal").alias("totsal")).where(col("totsal")>=50000).show()
+-------------------------------------------------
+o/p:
++---+------+
+|dno|totsal|
++---+------+
+| 12| 60000|
+| 13| 50000|
++---+------+
+==============================================================================
+33)union() :merging the rows of 2DF's
+The merging DF should have the same schema
+
+syntax: df1.union(df2)
+
+-----------------------------
+df.union(df).show()
+-----------------------------
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+=================================================================================
+33)intersect() :The common rows will be returned
+
+df.intersect(df).show()
+o/p:
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 11|103|  Sony|30000|  f|
+| 13|105| James|50000|  m|
+| 12|104| Sonia|40000|  f|
+| 12|102| Blake|20000|  m|
++---+---+------+-----+---+
+
+==============================================================================
+34)joins:
+
+Joins: USed to collect data from two or more datasets
+
+Joins are used for merging cols horizontally
+
+condition for join :Atleast one column should be common
+
+2 types of joins
+1)Inner Join
+2)Outer Join---->3 types--->1)left outer join
+                            2)Right outer join
+                            3)Full outer join
+
+A=1 B=1
+  2   2
+  3   3
+  4   7
+  5   8
+  6   9
+1)inner join: MAtching fields
+
+o/p:
+   (1,1)
+   (2,2)
+   (3,3)
+
+2)Left Outer join :Matchings +unmatched fields of left side 
+                             i.e total presence of left side
+   (1,1)
+   (2,2)
+   (3,3)
+   (4, )
+   (5, )
+   (6, )
+3)Right Outer join :Matchings +unmatched fields of Right side 
+                             i.e total presence of Right side
+   (1,1)
+   (2,2)
+   (3,3)
+   ( ,7)
+   ( ,8)
+   ( ,9)
+
+4)Full Outer join :Matchings +unmatched fields of left side 
+                             i.e total presence of left side
+                             +unmatched fields of Right side 
+                             i.e total presence of Right side
+   (1,1)
+   (2,2)
+   (3,3)
+   (4, )
+   (5, )
+   (6, )
+   ( ,7)
+   ( ,8)
+   ( ,9)
+
+
+
+syntax for join:
+----------------
+df1.join(df2,joining condition,"Type of Join")
+Types:
+1.inner
+2.outer
+3.left_outer
+4.right_outer
+5.full_outer
+
+ex: mystoragelakeadb9am-->dbfscontainer-->jsondata/emps2.json
+                                                 /dept.json
+
+//emps2.json
+{"eid":101,"ename":"Miller","sal":10000,"sex":"m","dno":11}
+{"eid":102,"ename":"Blake","sal":20000,"sex":"m","dno":12}
+{"eid":103,"ename":"Sony","sal":30000,"sex":"f","dno":11}
+{"eid":104,"ename":"Sonia","sal":40000,"sex":"f","dno":12}
+{"eid":105,"ename":"James","sal":50000,"sex":"m","dno":13}
+{"eid":106,"ename":"pavan","sal":60000,"sex":"m","dno":14}
+{"eid":107,"ename":"praveen","sal":70000,"sex":"m","dno":15}
+{"eid":108,"ename":"John","sal":80000,"sex":"m","dno":16}
+
+//dept.json
+
+{"dno":11,"dname":"Mrkt","city":"Hyd"}
+{"dno":12,"dname":"Fin","city":"Pune"}
+{"dno":13,"dname":"HR","city":"Mumbai"}
+{"dno":17,"dname":"sales","city":"Hyd"}
+{"dno":18,"dname":"Accounts","city":"Chennai"}
+{"dno":19,"dname":"Admin","city":"Hyd"}
+
+
+--------------------------------------------------------------
+base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+emps2_df = spark.read.format("json").load(base_dir+"jsondata/emps2.json")
+emps2_df.show()
+--------------------------------------------------------------
+
+o/p:
++---+---+-------+-----+---+
+|dno|eid|  ename|  sal|sex|
++---+---+-------+-----+---+
+| 11|101| Miller|10000|  m|
+| 12|102|  Blake|20000|  m|
+| 11|103|   Sony|30000|  f|
+| 12|104|  Sonia|40000|  f|
+| 13|105|  James|50000|  m|
+| 14|106|  pavan|60000|  m|
+| 15|107|praveen|70000|  m|
+| 16|108|   John|80000|  m|
++---+---+-------+-----+---+
+
+similarly loading dept.json and creating a dataframe
+-------------------------------------------------------------------------
+dept_df = spark.read.format("json").load(base_dir+"jsondata/dept.json")
+dept_df.show()
+--------------------------------------------------------------------------
+o/p:
+
++-------+--------+---+
+|   city|   dname|dno|
++-------+--------+---+
+|    Hyd|    Mrkt| 11|
+|   Pune|     Fin| 12|
+| Mumbai|      HR| 13|
+|    Hyd|   sales| 17|
+|Chennai|Accounts| 18|
+|    Hyd|   Admin| 19|
++-------+--------+---+
+
+1)inner join
+---------------------------------------------------------------------
+ij=emps2_df.join(dept_df,emps2_df.dno==dept_df.dno,"inner").select(emps2_df.eid,emps2_df.ename,emps2_df.sal,emps2_df.sex,emps2_df.dno,dept_df.dname,dept_df.city)
+ij.show()
+------------------------------------------------------------------------------
+o/p:
++---+------+-----+---+---+-----+------+
+|eid| ename|  sal|sex|dno|dname|  city|
++---+------+-----+---+---+-----+------+
+|101|Miller|10000|  m| 11| Mrkt|   Hyd|
+|102| Blake|20000|  m| 12|  Fin|  Pune|
+|103|  Sony|30000|  f| 11| Mrkt|   Hyd|
+|104| Sonia|40000|  f| 12|  Fin|  Pune|
+|105| James|50000|  m| 13|   HR|Mumbai|
++---+------+-----+---+---+-----+------+
+
+2)left_outer:
+-----------------------------------------------------------------------------
+loj=emps2_df.join(dept_df,emps2_df.dno==dept_df.dno,"left_outer").select(emps2_df.eid,emps2_df.ename,emps2_df.sal,emps2_df.sex,emps2_df.dno,dept_df.dname,dept_df.city)
+loj.show()
+------------------------------------------------------------------------------
+o/p:
++---+-------+-----+---+---+-----+------+
+|eid|  ename|  sal|sex|dno|dname|  city|
++---+-------+-----+---+---+-----+------+
+|101| Miller|10000|  m| 11| Mrkt|   Hyd|
+|102|  Blake|20000|  m| 12|  Fin|  Pune|
+|103|   Sony|30000|  f| 11| Mrkt|   Hyd|
+|104|  Sonia|40000|  f| 12|  Fin|  Pune|
+|105|  James|50000|  m| 13|   HR|Mumbai|
+|106|  pavan|60000|  m| 14| NULL|  NULL|
+|107|praveen|70000|  m| 15| NULL|  NULL|
+|108|   John|80000|  m| 16| NULL|  NULL|
++---+-------+-----+---+---+-----+------+
+
+3)right_outer
+-----------------------------------------------------------------------------
+roj=emps2_df.join(dept_df,emps2_df.dno==dept_df.dno,"right_outer").select(emps2_df.eid,emps2_df.ename,emps2_df.sal,emps2_df.sex,dept_df.dno,dept_df.dname,dept_df.city)
+roj.show()
+------------------------------------------------------------------------------
+o/p:
++----+------+-----+----+---+--------+-------+
+| eid| ename|  sal| sex|dno|   dname|   city|
++----+------+-----+----+---+--------+-------+
+| 103|  Sony|30000|   f| 11|    Mrkt|    Hyd|
+| 101|Miller|10000|   m| 11|    Mrkt|    Hyd|
+| 104| Sonia|40000|   f| 12|     Fin|   Pune|
+| 102| Blake|20000|   m| 12|     Fin|   Pune|
+| 105| James|50000|   m| 13|      HR| Mumbai|
+|NULL|  NULL| NULL|NULL| 17|   sales|    Hyd|
+|NULL|  NULL| NULL|NULL| 18|Accounts|Chennai|
+|NULL|  NULL| NULL|NULL| 19|   Admin|    Hyd|
++----+------+-----+----+---+--------+-------+
+
+4)full_outer:
+------------------------------------------------------------------------------
+foj=emps2_df.join(dept_df,emps2_df.dno==dept_df.dno,"full_outer").select(emps2_df.eid,emps2_df.ename,emps2_df.sal,emps2_df.sex,dept_df.dno,dept_df.dname,dept_df.city)
+foj.show()
+------------------------------------------------------------------------------
+o/p:
++----+-------+-----+----+----+--------+-------+
+| eid|  ename|  sal| sex| dno|   dname|   city|
++----+-------+-----+----+----+--------+-------+
+| 101| Miller|10000|   m|  11|    Mrkt|    Hyd|
+| 103|   Sony|30000|   f|  11|    Mrkt|    Hyd|
+| 102|  Blake|20000|   m|  12|     Fin|   Pune|
+| 104|  Sonia|40000|   f|  12|     Fin|   Pune|
+| 105|  James|50000|   m|  13|      HR| Mumbai|
+| 106|  pavan|60000|   m|NULL|    NULL|   NULL|
+| 107|praveen|70000|   m|NULL|    NULL|   NULL|
+| 108|   John|80000|   m|NULL|    NULL|   NULL|
+|NULL|   NULL| NULL|NULL|  17|   sales|    Hyd|
+|NULL|   NULL| NULL|NULL|  18|Accounts|Chennai|
+|NULL|   NULL| NULL|NULL|  19|   Admin|    Hyd|
++----+-------+-----+----+----+--------+-------+
+
+==============================================================================
+
+
+
+foj.dropna().show()
+
++---+------+-----+---+---+-----+------+
+|eid| ename|  sal|sex|dno|dname|  city|
++---+------+-----+---+---+-----+------+
+|101|Miller|10000|  m| 11| Mrkt|   Hyd|
+|103|  Sony|30000|  f| 11| Mrkt|   Hyd|
+|102| Blake|20000|  m| 12|  Fin|  Pune|
+|104| Sonia|40000|  f| 12|  Fin|  Pune|
+|105| James|50000|  m| 13|   HR|Mumbai|
++---+------+-----+---+---+-----+------+
+
+foj.na.fill(0).show()
+
++---+-------+-----+----+---+--------+-------+
+|eid|  ename|  sal| sex|dno|   dname|   city|
++---+-------+-----+----+---+--------+-------+
+|101| Miller|10000|   m| 11|    Mrkt|    Hyd|
+|103|   Sony|30000|   f| 11|    Mrkt|    Hyd|
+|102|  Blake|20000|   m| 12|     Fin|   Pune|
+|104|  Sonia|40000|   f| 12|     Fin|   Pune|
+|105|  James|50000|   m| 13|      HR| Mumbai|
+|106|  pavan|60000|   m| 14|    NULL|   NULL|
+|107|praveen|70000|   m| 15|    NULL|   NULL|
+|108|   John|80000|   m| 16|    NULL|   NULL|
+|  0|   NULL|    0|NULL|  0|   sales|    Hyd|
+|  0|   NULL|    0|NULL|  0|Accounts|Chennai|
+|  0|   NULL|    0|NULL|  0|   Admin|    Hyd|
++---+-------+-----+----+---+--------+-------+
+
+foj.na.fill({'ename':'unknown','eid':0,'sal':0,'sex':'unknown','dno':0,'dname':'unknown','city':'unknown'}).show()
+
++---+-------+-----+-------+---+--------+-------+
+|eid|  ename|  sal|    sex|dno|   dname|   city|
++---+-------+-----+-------+---+--------+-------+
+|101| Miller|10000|      m| 11|    Mrkt|    Hyd|
+|103|   Sony|30000|      f| 11|    Mrkt|    Hyd|
+|102|  Blake|20000|      m| 12|     Fin|   Pune|
+|104|  Sonia|40000|      f| 12|     Fin|   Pune|
+|105|  James|50000|      m| 13|      HR| Mumbai|
+|106|  pavan|60000|      m| 14| unknown|unknown|
+|107|praveen|70000|      m| 15| unknown|unknown|
+|108|   John|80000|      m| 16| unknown|unknown|
+|  0|unknown|    0|unknown|  0|   sales|    Hyd|
+|  0|unknown|    0|unknown|  0|Accounts|Chennai|
+|  0|unknown|    0|unknown|  0|   Admin|    Hyd|
++---+-------+-----+-------+---+--------+-------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

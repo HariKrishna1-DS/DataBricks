@@ -1,0 +1,277 @@
+Persistance:
+
+ -It is nothing but making a RDD available in the Ram enenthough the
+  next RDD is ready, so that it's output can be used by many other
+  flows, no need to re-execute
+==============================================================================
+Steps in RDD persistance:
+
+1.The RDD whose output is commonly used by multiple flows need to be persisted
+
+2.For persisting an RDD atleast one flow should be executed
+
+3.we need to persist the RDD before action is performed
+
+4.RDD's will be persisted when 1st time they are loaded into RAM and 
+  computed eventhough the persist option is specified in the
+  later steps but before the action
+
+5.2 methods to persist a RDD--->1.RDD.persist()
+                                2.RDD.cache()
+
+==============================================================================
+ex:
+
+RDD1=sc.textFile("filepath")
+
+RDD2=RDD1.map(sal=sal+5000)
+
+RDD3=RDD2.filter(city="hyd")
+
+RDD4=RDD3.map("......")
+
+RDD5=RDD4.GroupByKey("....")
+
+RDD3.persist()
+
+res=RDD5.collect()
+
+in the above flow, 5RDDs are declared.
+
+No RDDs are loaded (or) computed (or) persisted initially
+
+when action is performed--->R5.collect()
+                            then only flow executed from the Root RDD(RDD1)
+
+The Execution flow is
+
+RDD1------->Loaded + Computed
+
+RDD2------->Loaded + Computed + Ready
+            Now RDD1 will be removed from the RAM
+
+RDD3------>Loaded + Computed + Persisted immediately(Eventhough the persist
+                               option is given in the later steps)
+           Now RDD2 will be removed.
+
+RDD4------>Loaded + Computed and Ready
+           (RDD3 wont be removed)
+
+RDD5------>Loaded +computed and Read
+           Now RDD4 will be removed from the RAM
+           when action is completd then RDD5 also removed from the RAM
+
+           Now only RDD3 remains in the RAM.
+
+Examples
+
+Flow-I
+
+R1=sc.textFile("Filepath")
+R2=R1......
+R3=R2.....
+R3.persist() ---->R3 will be persisted
+R4=R3.....
+R5=R4.....
+R5.collect()
+
+
+Flow-II
+
+R1=sc.textFile("Filepath")
+R2=R1......
+R3=R2.....
+R4=R3.....
+R5=R4.....
+R3.persist() ---->R3 will be persisted
+R5.collect()
+
+when we say--->R5.collect(), it checks
+
+so during this checking process, it will come to know which RDDS need to be
+persisted while loading
+
+Now the flow starts and loads one by one RDD and persists the Required RDD
+while loading only
+
+Q)Can we persist 2 RDD's
+
+Flow-3
+R1=sc.textFile("Filepath")
+R2=R1......
+R3=R2.....
+R4=R3.....
+R5=R4.....
+R2.persist()----->R2 will be persisted
+R3.persist() ---->R3 will be persisted
+R5.collect()
+
+here first it checks
+R5 i/p is R4
+R4 i/p is R3
+R3 i/p is R2
+R2 i/p is R1
+R1 i/p is file
+Now during this checking [rocess it comes to jnow that R@ and R3 need to be
+persisted during loading
+
+Flow-4
+
+R1=sc.textFile("Filepath")
+R2=R1......
+R3=R2.....
+R4=R3.....
+R5=R4..... 
+R5.collect()
+R3.persist() here R3 wont be persisted bcoz
+             when action execution completed,we are trying to persist,
+             but by that time no RDDs in the RAM.
+
+
+Flow-5
+R1=sc.textFile("Filepath")
+R2=R1......
+R3=R2.....
+R3.collect()
+R3.persist()----->here R3 is not persisted , by this time all RDDs got removed from RAM
+R4=R3.....
+R5=R4..... 
+R5.collect()--->here the flow executed from where-->from starting
+                so flow starts from R1 to R5
+                from the next flow the R3 o/p can be re-used
+
+=============================================================================
+
+PERSISTENCE OPTIONS:
+
+1)MEMORY_ONLY
+2)MEMORY_SER_ONLY
+3)DISK_ONLY
+4)DISK_SER_ONLY
+5)MEMORY_AND_DISK_ONLY
+
+RDD will be persisted in RAM in object format
+
+SER----->Serialization-->converting object format to byte format
+                         as byte format occupies very less space
+
+de-serialization------->converting byte to object format
+
+==============================================================================
+          MEMORY_ONLY                     MEMORY_SER_ONLY
+
+1)Storage  :RAM                         1)Storage  :RAM
+2)Format   :object                      2)Format   :Byte
+3)Advantage:High speed                  3)Advantage:Here 50% less occupancy
+  bcoz here no need to de-serialize       of memory as Byte format occupies
+  It is already in object format          very less memory as compared with
+                                          object format
+
+4)Dis-advantage:More occupancy of       4)Disadvantage: Slower
+  space bcoz of object format             here to compute a RDD, it should
+  occupying more space compared           be de-serialized i.e to be converted
+  with Byte format                        to object format
+
+===============================================================================
+ex: 
+   slave1--->4GB RAM
+   slave2--->4GB RAM
+
+  RDD Size=9GB
+  This RDD cannot fit into RAM
+  so use MEMORY_SER_ONLY so that it can fit into RAM.
+
+==============================================================================
+If the RDDs are too big and if unable to fit in RAM, then we persist them 
+in disk
+
+         DISK_ONLY                     DISK_SER_ONLY
+
+1)Storage  :DISK                        1)Storage  :DISK
+2)Format   :object                      2)Format   :Byte
+3)Advantage:High speed                  3)Advantage:Here 50% less occupancy
+  bcoz here no need to de-serialize       of memory as Byte format occupies
+  It is already in object format          very less memory as compared with
+                                          object format
+
+4)Dis-advantage:More occupancy of       4)Disadvantage: Slower
+  space bcoz of object format             here to compute a RDD, it should
+  occupying more space compared           be de-serialized i.e to be converted
+  with Byte format                        to object format
+
+==============================================================================
+5)MEMORY_AND_DISK_ONLY
+
+ex: 
+   RDD size=8GB
+   RAM size=8GB
+   but here RAM is busy executing other RDD,only 5GB RAM is avaialble,
+   so RDD cannot fit 
+   so instead of execution failing,persist the RDD in disk,after some time
+   if RAM becomes free then remove from disk and persist in RAM
+
+Advantage :can be persisted either in memory(if available)/disk based on availability
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

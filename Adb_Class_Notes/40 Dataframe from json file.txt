@@ -1,0 +1,37 @@
+
+DataFrames creation from json
+-----------------------------
+creating a Dataframe from json data
+
+Step 1: upload the dataset
+         mystoragelakeadb6pm-->dbfscontainer-->jsondata--->person.json
+                               
+
+#Creating dataframe from JSON File
+
+
+//person.json
+{"name":"Ajay","age":30,"sex":"m"}
+{"name":"Miller","age":25,"sex":"m"}
+{"name":"Latha","age":30,"sex":"f"}
+{"name":"Sony","age":22,"sex":"f","city":"hyd"}
+{"name":"John","age":33,"sex":"m","city":"pune"}
+=============================================================================
+Step 2: Creating dataframe from jsondata
+
+----------------------------------------------------------------------
+base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+df1 = spark.read.format("json").load(base_dir+"jsondata/person.json")
+df1.show()
+----------------------------------------------------------------------
+o/p:
++---+----+------+---+
+|age|city|  name|sex|
++---+----+------+---+
+| 30|NULL|  Ajay|  m|
+| 25|NULL|Miller|  m|
+| 30|NULL| Latha|  f|
+| 22| hyd|  Sony|  f|
+| 33|pune|  John|  m|
++---+----+------+---+
+

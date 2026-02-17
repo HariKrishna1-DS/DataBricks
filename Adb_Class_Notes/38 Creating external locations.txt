@@ -1,0 +1,271 @@
+
+External Locations:
+-------------------
+
+We have a new type of object that unity catalog supports is-->External location
+
+Create an external location to an existing container (or) directory in ADLS
+using catalog explorer and also we can create by writing code also
+
+External location is like your dbfs mounts,
+
+create an external location,map it to your ADLS storage container and
+you can access data files from that container from within the databricks
+
+Advantage of External Location over DBFS mounts
+-----------------------------------------------
+-here the advantage is,once you create the external location, you can 
+ provide privilages on that external location and manage privilages from
+ unity catalog
+ but in DBFS mounts--->all users can access-->that is the dis-advantage
+
+==============================================================================
+1)Creating External Location:
+------------------------
+
+Goto catalog explorer--->we see "External data" ---->
+
+here we see
+1)External locations
+2)credentials-->i.e storage credentials
+                we should have atleast one storage credential which will have
+                access to the storage container
+               -Once you create a unity Catalog setup, u will have atleast
+                one storage credentials which we create
+               -here we see one storage credential available
+                which we created earlier
+   Name       purpose    credentialtype      properties
+ 1edbcd.....  storage     managed identity   connector id
+ click this-->we see permissions--->if you want to give permissions
+                                    here am not providing any
+
+ here just check whether we have one storage credential or not
+
+ Now--->click--->1)External locations---> No external locations available here
+
+ Now create one External location
+ (An external location allows you to access your data stored in ADLS)
+ click--->"create External Location"--->
+
+ External Location Name : external-data
+
+ url:
+    here we need to specify which container and storage account
+    we have 2 containers--->created already--->1)dbfscontainer
+                                               2)metastore-root-->we used this for
+                                                                  for unity catalog
+                                              so use dbfscontainer
+                                                     so create external location
+                                                     for this container
+url: abfss://dbfscontainer@mystoragelakeadb6pm.dfs.core.windows.net/
+
+storage credentials-->select from drop-down list
+                      1edbcd..................
+
+Advanced options:
+    read only--->if you want to provide only read-only permission
+                 as of now-->i wont select thos
+
+Create--->It creates the External location
+
+Now--click "External locations"-->we see the created external location
+                                  "external-data"
+
+click-->"external-data"-->permissions--->Grant-->to grant permissions for
+                                                  external locations
+                                                  here an not providing any
+
+click-->"external-data"-->browse--->To see what is present in external location
+                          -->we see--->sampledata (which we created already)
+                         within sampledata--->products.json(which we uploaded previously)
+
+You can also check from datalake--->containers-->dbfscontainer->sampledata
+                                                              -->products.json
+
+
+whatever data already there in container will be available within External location
+
+
+If you already have data in your external directory--->create external location
+ pointing to that directory and start using in databricks project
+
+but in case of dbfs mounts--->drawback is -->all users can access.
+but grant permissions in DBFS mounts is not possible, so everyone will have access
+
+==============================================================================
+2)Describe external location from the code
+
+--------------------------------------------------------
+%sql
+DESCRIBE EXTERNAL LOCATION `external-data`
+--------------------------------------------------------
+o/p:
+  name              url
+external-data	abfss://dbfscontainer@mystoragelakeadb6pm.dfs.core.windows.net/
+
+credential_name
+1ea61bc2-d47b-4d02-bebf-ff54fdcaa4fc-storage-credential-1733807673697
+
+This credential is used to access the storage container      
+
+===============================================================================
+3)Grant Read files privilages on external location to 'adb9am-dev'
+
+-we do it from catalog explorer
+
+Catalog explorer-->External-data-->External locations--->"external-data"--->
+
+Grant
+search for usergroup:-->adb6pm-dev---Grant-->
+
+It dispays all the permissions
+
+search-->usergroup--->adb9am-dev
+select-->ALL PRIVILEGES--->grant
+
+#(or) select-->Readfiles--->grant  --->not required
+
+Now we got read files permission
+
+we see the following:
+
+principal     privilage     object
+adb9am-dev    ALL PRIVILESGES   external-data
+#adb9am-dev    READ FILES   external-data
+
+I want to revoke(remove permission) the privilages from catalog explorer
+
+goto--->External locations->external-data-->permissions-->
+
+select-->adb6pm-dev    ALL PRIVILEGES   external-data--->revoke --->not required
+or#select-->adb6pm-dev    READ FILES   external-data--->revoke --->not required
+
+------------------------------------------------------------------------------
+4)Now i want to grant privilages by writing code (not from explorer)
+
+-------------------------------------
+%sql
+GRANT ALL PRIVILEGES ON EXTERNAL LOCATION `external-data` to `adb6pm-dev`
+or
+GRANT READ FILES ON EXTERNAL LOCATION `external-data` to `adb6pm-dev` --->not required 
+
+-------------------------------------
+
+granted to whom--->adb6pm-dev user group
+
+Now Go and check--->
+
+goto--->External locations->external-data-->permissions-->
+
+grant is added
+
+principal     privilage     object
+adb9am-dev    ALL PRIVILEGES   external-data
+#adb9am-dev    READ FILES   external-data
+
+If you want to revoke--->select and revoke
+
+===============================================================================
+5)List the contents of External location
+
+If you want to access the external location through code--->we need to use the url
+
+which url-->abfss://dbfscontainer@mystoragelakeadb6pm.dfs.core.windows.net/
+
+Now listing the  contents of External location
+
+--------------------------------
+%fs ls abfss://dbfscontainer@mystoragelakeadb6pm.dfs.core.windows.net/
+--------------------------------
+o/p--->sampledata
+
+To see the content of sample data
+---------------------------------
+%fs ls abfss://dbfscontainer@mystoragelakeadb6pm.dfs.core.windows.net/sampledata
+---------------------------------
+o/p :products.json
+
+here--->abfss:---->it is the qualifier to acces azure datalake storage directory
+
+If storage container created without external location-->u cannot access
+
+If you have not created any external location with proper credential
+to this  url,u cannot directly do this fs ls
+
+This is how to access data within external location
+
+
+thos url-->abfss://dbfscontainer@mystoragelakeadb6pm.dfs.core.windows.net/
+
+can be used within dataframe API for reading data from the directory
+
+==============================================================================
+To see more on this privilages-->refer to databricks dovumentation
+
+Google--->Unity Catalog privilages and securable objects-->
+
+
+databricks documentation--->docs.databricks.com
+
+metastore--->Top most object
+             already we created this from databricks account console
+
+             inside metastore--->we create catalog-->2nd level
+
+             within catalog--->we create database/schema --->3rd level
+
+             within database--->we create tables,views,volumes,functions->4th level
+
+
+see the diagram-->
+External locations and storage credentials are not part of schema/database
+
+In Unity-catalog--->Privilages are in-herited
+
+If privilage added on catalog level--->they are inherited to schema--->
+ --->from schema inherited to tables,views,volumes i.e all objects in schema
+
+ex:
+ in DEV catalog--->If you have assignes privilages to someone
+                   -here if 3 databases are created-->then you get all the
+                     privilages to all the 3 databases and its objects(tables,views,volumes etc)
+
+This is in-heriting privilages from higher level to lower level
+
+we can grant privilages at--->catalog level
+                              schema/database level
+                              table/volume    level
+               
+                          
+                                    
+                                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,162 @@
+
+
+Job cluster:
+
+Databricks Job:
+--------------
+1. Job is a process of scheduling a notebook
+
+2.A Job can be executed on-demand/scheduled based
+
+3. A scheduled job executes only on "Job cluster"
+
+4. A Job can be created using UI (or) CLI(command line Interface)
+
+5.A Job cluster terminates automatically when the job is completed
+
+6.A Job cluster cannot restart manually
+  Automatically it starts and automatically it gets terminated
+
+  bu we can re-start all purpose cluster
+
+7. A Job cluster is created by "Azure Databricks Job Scheduler" when job is created
+
+8. A databricks job can be executed immediately and manually using all purpose cluster
+
+==============================================================================
+steps:
+
+step 1: create Databricks workspace---->using Azure DAtabricks service
+
+step 2: Create a cluster---->type==>"all purpose cluster"
+
+step 3: create a notebook and attach the notebook to the cluster
+
+==============================================================================
+Name of Notebook: demonotebook
+
+1st cell-->python code
+print("Welcome to Databricks!!!!")
+y="hello"
+print(y)
+
+2nd cell-->scala code
+%scala
+println("Welcome to Scala")
+val x=10
+val y:String="hello"
+val z=x*2
+val p={val x=10; x+10}
+val m={val a=10
+       val b=20
+      (a+b)
+       }
+==============================================================================
+Creating a job and Scheduling a job
+
+Once notebook is ready with some data,
+now scheduling a job
+
++New---->Job
+
+Task name* :Demotask
+Type*      :Notebook
+Source*    :Workspace
+path  ----->select-->users--->mailid--->notebookname->demonotebook-->confirm
+            This is the notebook i want to run
+
+cluster   :adb10amcluster(select all purpose cluster)
+           at runtime job cluster gets created automatically
+
+Dependent libraries :add ( as of now not required)
+Parameters    :
+Notifications : for email notifications--->when sucess/failure/start
+
+retries :Jobs that fail are retried a number of times
+           You can specify a maximum number of attempts for a run and a 
+           minimal interval between attempts.
+
+           give no of retry attempts and time-interval b/w them
+
+Duration
+
+create task---->It will create a job
+
+Jobname :myjob1
+
+It is not scheduled--->
+
+at the top right corner--->Run now--->To run immediately
+
+click--->schedule and triggers
+
+Trigger status : Active
+
+Trigger type: Scheduled
+
+Scheduled type:Advanced
+
+      Every  1 min----->save
+
+ click runs--->select date
+
+once succeeded--> click it--->we see the o/p
+
+==============================================================================
+Job-cluster is auto-created and auto terminated
+but physicl task is done by All-purpose cluster
+
+Ex:2
+
+
+New--->Notebook =====>Name:sample1
+
+                     print("Hello......")
+                     print("Good Morning.....Hyderabad!!!!")  
+
+Creating a new job(myjob2)   
+             New---->Job
+                    Task name: task2
+                    Type  :Notebook
+                    source:workspace
+                    path--->users-->Gmail---->sample1---->confirm               
+                    cluster :job cluster
+                    create task
+
+Job to be scheduled:
+--------------------
+New--->job
+     Trigger Status:Active
+
+                   Paused
+Trigger type---->Schedule
+Advanced
+
+schule--provide date and time and time zone--->save
+
+Runs-->
+
+compute---->job compute--->wil be created and terrminated for every job
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

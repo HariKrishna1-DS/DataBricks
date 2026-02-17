@@ -1,0 +1,163 @@
+
+Fault Tolerance model in spark(while execution)
+
+Case 1:when Current RDD partition machine is down
+previous RDD                     current RDD
+   R1--------->o/p------>i/p------->R2
+ p1 p2 p3                         p1 p2 p3
+ s1 s2 s3                         s4 s5 s6
+                                        down
+
+if s6 machineis down
+
+During execution of currernt RDD(R2) if anyone of the partition(p3) of
+current RDD(R2) is down, then all the current RDD partitions(p1,p2,p3 of R2)
+ will be deallocated(cleared from RAM) and re-loaded in another slaves
+ by taking the i/p from its previous RDD(R1)
+
+so here 3 partitions are stored in 3 diff machines excluding the machine 
+which is down
+
+===============================================================================
+case 2: when the previous RDD partition machine is down
+
+       R1--------------->R2--------------->R3
+   (not available)     (prev)           (Current)
+       s1                s2                s3
+
+During execution of R3,while taking i/p from R2,if R2 partition machine is
+failed, then R2 cannot be re-loaded (or) re-initiated in another machines
+bcoz R2 i/p is R1,which is not available in Ram.
+
+so the process should start from beginning or from the persisted RDD
+
+one way this is good---->we made the flow to execute
+one way this is bad ---->already R1,R2 are processed,again we are re-processing
+
+==============================================================================
+case 3: I?f a persisted RDD machine is down
+
+  R1--------->R2------------>R3---------->R4----------->R5
+  s1          s2             s3           s4            s5
+                         (persisted)
+                         If it is down
+
+R3 is stored in slave3 and persisted, but suddenly s3 is down
+then the flow will re-execute from beginning or from the available RDD 
+automatically till R3 without performing action and R3 will be re-persisted
+
+==================================================================================
+case 4:
+
+
+R1--------->R2------------>R3---------->R4----------->R5
+  s1          s2           s3         s4            s5
+                         (persisted)   down
+
+while executing R5,while taking i/p from R4,if R4 is failed
+then i/p is taken from R3(which is available in Ram) and re-loads R4
+in anonther machine/machines and computes and provides i/p to R5
+
+===============================================================================
+case 5:
+ Q)Can we persist 2 RDDS------>yes
+   
+  R1--------->R2------------>R3---------->R4----------->R5------>R6
+  s1          s2             s3           s4            s5       s6
+                         (persisted)     down        persisted
+
+
+ case i)IF persisted RDD(R5) machine is down,what happens??
+        then flow will be re-executed from R3 to R%automatically
+        and R5 will be re-persisted.
+
+ case ii) If persisted RDD(R3) machine is down , flow will be re-executed from
+           R1 to R3 automatically and R3 wil be re-persisted
+
+==============================================================================
+Importance of persistance:
+
+R1--->R2--->R3---->R4.................R98--->R99--->R100
+
+Case 1: During the computation of R100,if R100 is down
+        then takes i/p from R99 and R100 is re-loaded into other machines 
+        and computed
+
+case 2:During computation of R100, while taking i/p from R99,R99 is down,
+       R99 can't be re-loaded on other machines bcoz its i/p is R-98
+       is not available 
+       so in this case flow starts from beginning i.e from R1
+
+case 3:
+       again while starting from R1, when it comes to R95, if R94 is down
+       as R93 is not available, again the flow stsrts from the beginning
+
+case 4:
+       if you persist R90, then no need to re-execute from the starting
+       it takes R90 o/p and computes
+
+     here when R-90 will be persisted-->when 1st time it is loaded,it is persisted
+
+     but when you are re-executing from the beginning--
+     assume ur flow execution is at R-87, still R90 not loaded and persisted,
+     if R-86 is down again flow starts from the beginning
+
+     so persist--->R50
+                   but still to compute R94,44 steps you are re-executing
+
+     so the best way is --->persist for every 25RDDs
+
+      R25.persist()
+      R50.persist()
+      R75.persist()
+      if R-86 is down then the flow will re-execute from R75 to R86
+      but not from the beginning
+
+     if memory is Good, persist for every 10Rdds,i.e R10,R20......R90
+
+    Once the flow is executed and action is completed, you can un-persist
+    all the RDDs
+    like R10.unpersist()
+         R20.unpersist()
+          .
+          .
+          .
+   RDD.unpersist()---->unpersisting happens immediately(on-demand)
+   RDD.persist() ----->perssit wont happen immedialtely(on-demand)
+                       it happens during the flow execution
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

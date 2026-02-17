@@ -1,0 +1,126 @@
+
+
+Creating ADB instance:
+----------------------
+
+
+Subscription :free trial
+Resource group--->create-(New)--> adb10am
+Instance Details
+Workspace name--->adbworkspace10am
+Region :East US
+Pricing Tier :Premium
+
+Review+create--->create
+
+Goto Resource---> Launch workspace
+
+workspace opens--->here we can perform many operations
+
+creating cluster:
+----------------
+Now here we need to create a cluster--->with driver and worker nodes
+
+click--->compute--->we see different types of clusters
+
+mainly 3 types of clusters
+
+1)All purpose cluster: we can perform anything here
+                used for every program (or) job to run in Databricks session
+                This cluster has both Driver and worker nodes 
+        It is created,deleted or terminated manually by the user
+        
+2)Job cluster :It is auto created and deleted or terminated by databricks
+               here , we wont see any create button--->for creating this
+3)pool cluster-->we can create
+
+==============================================================================
+click--->compute---->select--->all purpose cluster--->create compute
+
+Modify the name for cluster--->ADB101mcluster
+
+Policy :Unrestricted
+
+select--->Single node
+Access mode :Single user
+
+Performance
+Databricks runtime version
+Runtime: 13.3 LTS (Scala 2.12, Spark 3.4.1)
+
+Node type :Standard_DS3_v2
+           14 GB Memory, 4 Cores
+ 
+Terminate after:10 minutes of inactivity
+
+Create--->compute ---->It takes around 5 mins
+
+==============================================================================
+If Single node---->we wont see
+1)autoscaling
+2)we wont see worker node type
+3)we wont see Driver node type
+
+min termination time :10mins
+max termination time :43200mins
+If cluster not used for 10mins--->terminates automatically
+
+in multinode--->more node u select--->more cost applied
+============================================================================
+
+Photon--->It is a feature in Azure Databricks that accelerates queries and
+          improves performance for diff workloads
+                
+          This is automatically enabled for cluster running 
+          Databricks runtime 9.1LTS and above
+
+Photon offers the following benefits
+1) Faster queries :process data faster including joins, aggregation and groupings
+
+2)Improves scan performance : performs better on tables with many columns
+
+3)Fast writing :photon writes tables faster including wide tables with
+                thousands of columns
+
+4)Improves AI and ML performance:
+   Even more performance for applications using sparksql,sparkDatafrmaes
+
+5)price  and speed performance advantages--->Photon offers
+          upto 80% savings and upto 12x speed up
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

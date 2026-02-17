@@ -1,0 +1,52 @@
+
+Notebook Menus:
+
+File-Menu
+   -New---->Noteboook creation
+    Rename
+    move
+    delete
+    import
+    export--->Notebook  in 4 diff formats
+              1)DB archieve---->mostly used
+              2)source file---->python format
+              3)ipython notebook(Jupyter Notebook)
+              4)HTML
+    share
+    schedule
+    add data
+    upload data to DBFS
+-------------------------------------------------------------------------------
+2)Edit MEnu --->For standard editing options
+         cut
+         copy 
+         paste of Notebook cells
+         delete
+         insert cell above/below
+         Notebook python indentation--->by default it is 4 spaces
+                                        we can change it
+
+-----------------------------------------------------------------------------
+3)view
+  cell layout--i)standard
+              ii)results only
+             iii)side by side--->code and results---->side by side
+
+-----------------------------------------------------------------------------
+4)Run
+   -Run and Debug
+   -clear output
+   -clear state and output option---->one cell doesnt know what happened
+                                      in previous cell
+    ex:  name="Ajay"--->cell1 
+
+         print(name)--->cell2
+
+  after execting cell1, if we execute cell2--->here cell2 knows the name="Ajay"
+  if i say clear state and output--->then cell2 doesnt know the name in cell1
+  it gives error--->so again execute cell1 and then cell2
+
+
+
+
+  

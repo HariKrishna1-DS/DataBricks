@@ -1,0 +1,29 @@
+
+
+working with Notebook
+---------------------
+
+upn the cluster---->we need to create notebook
+
+new--->Notebook
+       --->by default---->langauge selected is python for the notebook
+                     we can change to other language like scala/R-LAnguage
+
+           we have cell here-->for each cell default language-->python
+                                       we can change cell language to other
+
+  we have some magic commands
+  for python---->%py
+  for scala----->%scala
+  for r-language->%r
+  for sql-------->%sql
+        
+
+  in cell--->default language-->python
+  %scala --->automatically  cell language changes to scala
+  %r    --->      "           "     "        "    to r-language
+  %sql
+ 
+  I want to change the entire notebook language--->At the top->select language
+                          
+

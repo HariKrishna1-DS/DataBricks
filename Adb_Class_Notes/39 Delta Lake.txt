@@ -1,0 +1,72 @@
+DeltaLake and Delta Tables:
+===========================
+
+-Databricks platform combines datalake with apache spark and brings it 
+ together,ready to use in databricks platform
+
+-Delta lake is an seperate open source project, it is not part of spark
+
+what is Delta lake??
+-------------------
+
+-Delta Lake is an open source Storage framework that enables building a
+ lakehouse architecture with compute engines which includes spark,Flink,
+ Hive and APIs for scala,Java,Python
+
+Delta Lake works b/w distributed data processing engine(spark) and the 
+storage layer(Azure Data Lake Storage-ADLS)
+
+-Delta lake sit in beween these two
+
+-Delta Lake is not only available for apache spark, it is also available
+ for other platforms
+
+==============================================================================
+Key featuresof DElta Lake:
+-------------------------
+
+1)brings delete,update and merge operations of table into apache spark
+
+ in spark updating and deleting happens at file level
+ i.e you need to delete the entire file
+
+2)Schema evolution for ur tables
+
+3)Streaming and batch unification
+
+ batch data : TB or PB of data, you bring to storage layer and work
+
+ Streaming data :-->the data which keeps on incrementing
+          small set of data-->intervals of data-->bringing to storage layer and work
+
+4)Optimization Techniques
+
+==============================================================================
+who is using Delta lake
+   Deltalake is available as a connector to
+       -Apache spark-->adapting delta lake
+       -SnowFlake ---->   "        "
+       -RedShift
+       -Apache Hive
+       -Apache Flink
+       -PowerBI
+       -kafka
+=============================================================================
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

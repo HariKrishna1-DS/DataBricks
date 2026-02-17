@@ -1,0 +1,27 @@
+
+
+cluster types:
+1.All-purpose cluster: manual scaling
+                       configured with diff amount of compute resources
+                       These clusters can be created manually and are
+                       persistent--->they can be terminated and restarted
+                       at anytime
+
+
+2.Job cluster:for running automated tasks--->such as ETL pipelines
+              job clusters are generated--->when a job begins execution and
+              are terminated automatically when the job is complete
+              They cannot be re-started
+
+Feature               All-purpose cluster          Job cluster
+-------               -------------------          ------------
+Creation    -------->manual(UI,CLI or RESTAPI)---->Automatic(by job scheduler)
+Termination--------->manual(can be restarted)----->Automatic(terminated after job)
+Scalability--------->Manual scaling possible ----->Not scalable
+Cost --------------->charge high             ----->lower cost
+No of users---------->Multiple users         ----->single job
+usecase ------------->Interactive analysis   ----->scheduled jobs 
+                      collaboration                batch processing
+
+==============================================================================
+

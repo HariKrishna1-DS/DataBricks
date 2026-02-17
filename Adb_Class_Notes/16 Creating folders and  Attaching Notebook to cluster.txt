@@ -1,0 +1,142 @@
+
+
+Azure Databricks Workspace: 
+-Serverless Application running in Azure cloud and we access it
+ though web UI
+
+Workspace--->It is a Gateways to code,directories,files and folders
+
+workspace--->workspace
+                -shared folder
+                 users folder
+                   -vijay@gmail.com---->home directory for login user
+                                        home directory for workspace
+ 
+                      create--->folder
+                                file
+                                notebook
+                -Repos----->WE can connect workspace with Github/Azure Devops
+
+-----------------------------------------------------------------------------
+
+Recents ---->List of Recent items
+
+catalog---->we see the created tables
+
+workflows---->Creating complex workflows and also we see scheduled tasks
+
+compute----->For creating cluster
+
+-----------------------------------------------------------------------------
+Data Engineering
+  -Job Runs---->If we click--->We see the the same workflows job runs
+
+==============================================================================
+while creating cluster for learning purpose
+   -disable photon acceleration
+   -select less RAM--->14GBRAM
+
+for multi-node
+    each node will have 4 cores
+   if u select 2nodes min means---->8 cores
+   if u select 4nodes max means---->16 cores
+   means 8-16 cores will be utilized
+
+while creating cluster we see the following
+
+1)Configuration
+
+2)Notebboks--->displays all the notebooks created
+
+3)libraries --->allows to install additional libraries required
+
+4)Event log-->log entries created during start and stop time of cluster
+
+5)Spark UI/Spark UI master --->displays the spark running jobs
+
+6)Driver logs---->here we see 3 sections
+                              1)stdout
+                              2)stderr
+                              3)log4j
+
+at top right corner we see-->
+
+1)more--->restart-->for restrating a cluster
+          delete --->for deleting a cluster
+2)terminate--->to stop the cluster
+
+3)Edit--->we can change the settings of the cluster like
+          DBRuntime version, termination time etc..
+          once you edit tht cluster--->we need to restart fot the changes
+          to be applied.
+===============================================================================
+After creating cluster--->Now goto Azure portal
+
+check all resources
+ here we see-->virtual machine
+               2 Disks
+               2 network interfaces
+               1 public ip address
+
+all these are created and used by databricks cluster
+
+These remains here even the cluster is terminated
+Azure still charge you for disks  and ip address
+
+===============================================================================
+Now permanetly deleting the cluster
+
+Goto compute--->displays all the avialable clusters
+                  select the cluster---->delete
+
+Now go and check-->all resources
+         we wont see all these
+               virtual machine
+               2 Disks
+               2 network interfaces
+               1 public ip address
+
+============================================================================
+ creating folder and within that 
+   -creating Notebook and 
+   -attaching that notebook to cluster
+
+ workspace--->workspace--->rightclick--->Create--->folder--->adb10am
+             -adb10am--->rightclick--->create--Notebook--->sample2(name)
+
+             sample1(filename)    python(language)  connect(cluster)
+                                                       no cluster available
+             Notebook runs on a cluster
+             You should have atleast one cluster running
+
+             To create a new cluster/resource--->click that connect
+                                                select a cluster if available
+                                      if not avialable--> create a cluster
+
+    Databricks creates a new cluster and attaches this notebook to it
+    --------------------------------------
+     print("Good Morning!!!")
+    --------------------------------------               
+    This Notebook(Sample2) is attached to the cluster and executed by the
+    cluster
+    click connect-->select the cluster you created--->
+    we see ------------>options--->detach --->means detach this notebok
+                                              to this cluster and attach to
+                                              other cluster
+                                  in real time we have multiple clusters
+                                  like dev cluster,test cluster
+                                          ex:detach from dev cluster and 
+                                              attach to test cluster
+                         we can run the same notebook in diff environments
+                                   restart   
+                                   terminate
+=============================================================================
+   
+
+
+
+
+
+
+
+

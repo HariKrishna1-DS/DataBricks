@@ -1,0 +1,128 @@
+
+
+Widget utility:
+--------------
+  -It allows to add input arguments or parameters to the notebook
+
+  -It allows to write a parameterized code
+
+  -A code that works for diff values depending upn the input parameter
+
+  Goback to child notebook
+
+  add a cell at the top of the notebook as 1st cell--->click code+
+
+  -------------------------------
+  dbutils.widgets.help()
+  -------------------------------
+
+ databricks widgets provides some methods to add arguments
+
+ The most commonly used method is---->text() method
+
+ other methods are:
+
+ 1.combobox()
+ 2.dropdown()
+ 3.multiselect()
+ 4.remove(name: String): Removes an input widget from the notebook
+ 4.removeall--->for removing all widgets in the notebook
+ 5.get()-->Retrieves current value of an input widget
+ 6.text(name: String, defaultValue: String)Creates a text input widget with a given name and default value
+
+ The most important method is---->get() method
+
+ get() method allows to read the i/p argument value
+
+ I will use text() method to add text argument to the notebook
+
+ -----------------------------
+dbutils.widgets.text("msg","","your input parameter")
+------------------------------
+text()method takes 3 arguments:
+
+1st argument--->Name of the input variable
+2nd argument--->if no value is given-->null value
+3rd argument--->Label
+
+execute-->we get a text box at the top as
+
+your input parameter _________ -->You can type a i/p value
+        whaterver value you type here will be assigned to a variable in the
+        utility package
+you can retrieve the i/p value using the get() method
+
+in another cell--->
+----------------------------------
+
+p_msg=dbutils.widgets.get("msg")
+----------------------------------
+Execute
+
+in another cell
+--------------------------------------
+
+print("I am a child notebook and i recieved:"+p_msg)
+---------------------------------------
+Execute:-->o/p: I am a child notebook and i recieved:
+
+here am concatenating the i/p value to print msg and run
+herw we wont get any
+
+bcoz we didnt set any value-->i.e the text box is empty
+
+place some value in the text box and say--->run all
+
+your input parameter: Hello
+
+Say--->run all
+ignore the existting  execution--->yes
+
+o/p:
+I am a child notebook and i recieved:Hello
+
+Now the argument has a value
+
+So in this way , we can define one or more variable inputs to your notebook
+and get them into python variables and use them in your code
+
+Now--->Calling the child notebook from the parent notebook
+
+Go back to the parent notebook
+
+as child notebook accepts one argument value
+so i can pass the argument value from here
+
+-----------------------------------------------
+
+dbutils.notebook.run("./childnotebook",40,{"msg":"call from parent"})
+-----------------------------------------------
+passing an argument in the form of (k,v) pair
+
+run it--->we get notebook workflow job---> it succeeds after some secs
+          click the link--->we see the o/p 
+          I am a child notebook and i recieved:call from parent
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  

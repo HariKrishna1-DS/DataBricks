@@ -1,0 +1,59 @@
+
+List of directories in DBFS root storage
+----------------------------------------
+
+
+--------------------------
+%fs ls dbfs:/         ----------->displays all the directories 
+--------------------------
+
+here dbfs--->is the qualifier
+       /---->is the root directory
+
+displays all the default directories which are already created to store some 
+kind of configurations
+
+-we cannot use these dbfs root directories for storing some data or project
+ purpose bcoz that goes into default storage account created by workspace
+
+-we dont want this bcoz we diesnt have proper access to it
+
+create our own storage accout----->bring it to dbfs--->we can use it
+
+how to access the dbfs root--->%fs ls dbfs:/
+------------------------------------------------------------------------------
+accessing the sub-directories within the root directory of DBFS:
+
+ex: we see dbfs:/databricks-datasets/
+
+showing the contents of a dbfs-directory inside the root using the following
+
+1.with dbfs qualifier
+
+2.without dbfs qualifier
+
+1)with dbfs qualifier:
+  --------------------
+
+------------------------------
+%fs ls dbfs:/databricks-datasets
+------------------------------
+
+2)without dbfs qualifier
+
+------------------------------
+%fs ls /databricks-datasets
+------------------------------
+
+by default if you are not using any filesystem qualifier,by default it is
+dbfs qualifier
+bcoz dbfs is a default filesystem for databricks
+
+=============================================================================
+
+
+
+
+
+
+

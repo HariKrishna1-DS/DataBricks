@@ -1,0 +1,116 @@
+
+==============================================================================
+stages  and tasks in Pyspark
+----------------------------
+
+df1----------->3 partitions---------->p1  p2  p3 * t1------------->
+                                       |   |   |
+df2=df1.t1()-->Narrow Transformation->p1  p2  p3 * t2------------->
+               (No Shuffling)
+                                       |   |   |
+df3=df2.t2()-->Narrow Transformation->p1  p2  p3 * t3------------->upto here
+                (No shuffling)          \/  \/                     STAGE-1
+                                        /\  /\
+df4=df3.t3()-->Wide TRansformation--> p1  p2  p3 * t4------------>STAGE-2 Starts
+                  (Shuffling happens
+                                       |   |   |
+df5=df4.t4()-->Narrow Transformation->p1  p2  p3 * t5------------>STAGE-2 ends
+                                        \/  \/                    
+                                        /\  /\
+df6=df5.t5()--->wide Transformation-->P1  P2  P3  -------------->STAGE-3 starts
+
+
+when a wide Transformation is applied on a DF,then a new stage will be created
+
+No. of stages=No of wide TRansformations+1
+      
+in the above example->No of wide Transformations=2
+so No of stages=wide T/Rs+1
+               =2+1
+               =3stages(STAGE1,STAGE2,STAGE3)
+
+if data shuffled for 2 times--->then no of stages=3
+
+if 5 stages are created--->No of wide Transformations==>4
+
+==============================================================================
+what is a stage--->?
+
+Stage : A Stage is a collection of all Transformations(Narrow) which doesnt
+        involve shuffling
+        once shuffling involved means new stage will be created
+   
+        from df to df, if data is flowing without shuffling then it is a stage
+
+-If shuffling is involved then a new stage is created.
+==============================================================================
+Relation b/w Stage and Task
+
+DF------->3 partitions---(p1,p2,p3)x T/R1 applied on each partition
+          executor=(partition+T/R)
+          3 partitions --->3 Executors ------>3 Tasks
+
+
+       B1      B2      B3
+        |       |       |
+ Df1--->P1      P2      P3 (p1,p2,p3)*t1 ===>3 Executors, 3 Tasks----------------------->
+ N.T    |t1     |t1     |t1
+ 
+ df2--->P1      P2      P3 (p1,P2,P3)*t2 ===>3 Executors ,3 Tasks          ------->Stage 1
+N.T     |t2     |t2     |t2
+
+ df3--->P1      P2      P3 (p1,P2,P3)*t3===>3 Executors ,3 Tasks----------------------->
+W.T         \       \ (here shuffling happens within the partitions)
+ df4--->P1      P2      P3 (p1,P2,P3)*t4===>3 Executors ,3 Tasks------->--------stage2 starts
+N.T     |t4     |t4     |t4                                     untill when stage2 continues??
+                                                        untill another wide T/R is encountered
+df5--->P1      P2      P3 (p1,P2,P3)*t5===>3 Executors ,3 Tasks------->
+N.T     |t5     |t5     |t5
+ df6--->P1      P2      P3 (p1,P2,P3)*t6===>3 Executors ,3 Tasks------->--------Stage 2 ends
+W.T     |t6     |t6     |t6(here shuffling happens)
+
+df7--->P1      P2      P3 (p1,P2,P3)*t7===>3 Executors ,3 Tasks-------> stage3 starts
+N.T     |t7     |t7     |t7
+
+
+
+As long as the T/Rs are Narrow ,they fall in the same Stage
+
+whenever shuffling happens----->a new stage is created
+
+
+Stage: Execution of sequence of Narrow Transformations
+
+New Stage -->gets created for a wide T/R.
+
+Executor: Program which executes a partition
+
+Task : A partition under Execution
+
+
+Driver :which monitors the Executors
+        i.e whether are killed /running
+
+Driver wont process the partitions
+
+only Executors process the partitions
+
+==============================================================================
+1)If no of stages=4 ----->then no of wide Tramsformations=3
+
+2)If no of wide Transformations=5--->then no of stages=6
+
+3)If no of partitions=5------>then no of executors=5
+
+4)If no of partitions=5------>then no of tasks=5
+
+5)If no of executors=4 ------>then no of tasks=4
+
+6)If no of executors=3-------->then no of drivers=1
+
+==============================================================================
+2 Types of Transformations:
+
+1.Narrow Transformation--------->No shuffling of data involved
+
+2.Wide Transformation ---------->Shuffling of data involved

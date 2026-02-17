@@ -1,0 +1,59 @@
+
+more magic commands
+
+1)%py
+2)%scala
+3)%r
+4)%sql
+
+5)%fs---->file system commands
+  ex:
+    -------------------------------
+      %fs
+       ls /databricks-datasets    ----->displays all the datasets
+   --------------------------------
+   databricks comes with some predefined datasets in your default dbfs directory
+ 
+  ex: checkwith any dataset directory
+-------------------------------------
+  %fs
+  ls /databricks-datasets/airlines ----->displays all the files and folders
+-------------------------------------- 
+
+Using Linux shell commands
+-------------------------------------------------
+%sh
+tail /databricks-datasets/airlines/part-00000---->displays the last 10 lines
+--------------------------------------------------
+
+Notebook inherits some bunch of magic commands from ipython
+
+-----------------------------------------------------------------------------
+To get the list of all the magic commands
+--------
+%lsmagic -------->displays the list of all magic commands
+---------
+
+To see the documentation for a particular magic command(?)
+-----------
+%env?
+----------
+
+To see the source code of a magic command(??)
+---------
+%pip??
+---------
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+

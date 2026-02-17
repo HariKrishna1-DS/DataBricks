@@ -1,0 +1,593 @@
+
+
+Pyspark functions:
+-----------------
+1)withColumn(): we can perform the following
+           1)for changing the column datatype
+           2)for modifying or updating the column value
+           3)Deriving a new column from the existing column
+           4)Renaming a column
+           5)dropping a dataframe column
+-----------------------------------------------------
+data=[(101,'Miller',50000,'2020-02-21','M','pune'),
+      (102,'Blake',60000,'2019-04-15','M','hyd'),
+      (103,'Sony',70000,'2021-06-25','F','pune'),
+      (104,'alia',80000,'2018-03-17','F','hyd')
+      ]
+columns=["Empid","Empname","Salary","JoinDate","Sex","City"]
+df=spark.createDataFrame(data=data,schema=columns)
+df.show()
+----------------------------------------------------------
+o/p:
+
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 50000|2020-02-21|  M|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  104|   alia| 80000|2018-03-17|  F| hyd|
++-----+-------+------+----------+---+----+
+
+1)for changing the column datatype
+  for changing th column datatype,we use cast() function along with withColumn()
+
+
+-----------
+df.printSchema()
+------------------
+o/p:
+root
+ |-- Empid: long (nullable = true)
+ |-- Empname: string (nullable = true)
+ |-- Salary: long (nullable = true)
+ |-- JoinDate: string (nullable = true)
+ |-- Sex: string (nullable = true)
+ |-- City: string (nullable = true)
+
+changing the datatype of Salary column  from long to int
+
+------------------------------------------------
+from pyspark.sql.functions import col
+df1=df.withColumn("Salary",col("Salary").cast("Integer"))
+df1.show()
+
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 50000|2020-02-21|  M|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  104|   alia| 80000|2018-03-17|  F| hyd|
++-----+-------+------+----------+---+----+
+--------------------------------------------------
+df1.printSchema()
+
+o/p:
+
+root
+ |-- Empid: long (nullable = true)
+ |-- Empname: string (nullable = true)
+ |-- Salary: integer (nullable = true)
+ |-- JoinDate: string (nullable = true)
+ |-- Sex: string (nullable = true)
+ |-- City: string (nullable = true)
+------------------------------------------------------------------------
+ii)for modifying or updating the column value
+    i)updating with a value
+   ii)updating based on condition
+
+Task:incrementing the salaries with a hike of 20%
+----------------------------------------------------
+df2=df.withColumn("Salary",df.Salary+df.Salary*0.20)
+df2.show()
+o/p:
++-----+-------+-------+----------+---+----+
+|Empid|Empname| Salary|  JoinDate|Sex|City|
++-----+-------+-------+----------+---+----+
+|  101| Miller|60000.0|2020-02-21|  M|pune|
+|  102|  Blake|72000.0|2019-04-15|  M| hyd|
+|  103|   Sony|84000.0|2021-06-25|  F|pune|
+|  104|   alia|96000.0|2018-03-17|  F| hyd|
++-----+-------+-------+----------+---+----+
+---------------------------------------------------------------
+Updating with a constant value
+Task: adding 5000 as bonus to the sals of each employee
+
+--------------------------------------------------------------
+df2=df.withColumn("Salary",df.Salary+5000)
+df2.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 55000|2020-02-21|  M|pune|
+|  102|  Blake| 65000|2019-04-15|  M| hyd|
+|  103|   Sony| 75000|2021-06-25|  F|pune|
+|  104|   alia| 85000|2018-03-17|  F| hyd|
++-----+-------+------+----------+---+----+
+--------------------------------------------------------------
+
+ii)updating based on condition using when()
+   -here we use withColumn() along with when()
+    modify---->"M"------>"MALE"
+               "F"------>"FEMALE"
+
+--------------------------------------------------
+from pyspark.sql.functions import when
+df3=df.withColumn("Sex",when(df.Sex=="M","MALE",)
+                       .when(df.Sex=="F","FEMALE")
+                       .otherwise(df.Sex))
+df3.show()
+o/p:
++-----+-------+------+----------+------+----+
+|Empid|Empname|Salary|  JoinDate|   Sex|City|
++-----+-------+------+----------+------+----+
+|  101| Miller| 50000|2020-02-21|  MALE|pune|
+|  102|  Blake| 60000|2019-04-15|  MALE| hyd|
+|  103|   Sony| 70000|2021-06-25|FEMALE|pune|
+|  104|   alia| 80000|2018-03-17|FEMALE| hyd|
++-----+-------+------+----------+------+----+
+
+==============================================================================
+3) Adding new column:
+   -Adding a new column with default/constant/None/Null value
+   -Adding a new column based on another column
+   -Adding a new column based on condition
+
+i)Adding a new column with constant
+  -here we use a function called--->lit() function
+
+Task: adding a new column (hike_percent)
+--------------------------------------------
+from pyspark.sql.functions import lit
+df4=df.withColumn("Hike_percent",lit(0.30))
+df4.show()
+o/p:
+ +-----+-------+------+----------+---+----+------------+
+|Empid|Empname|Salary|  JoinDate|Sex|City|Hike_percent|
++-----+-------+------+----------+---+----+------------+
+|  101| Miller| 50000|2020-02-21|  M|pune|         0.3|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|         0.3|
+|  103|   Sony| 70000|2021-06-25|  F|pune|         0.3|
+|  104|   alia| 80000|2018-03-17|  F| hyd|         0.3|
++-----+-------+------+----------+---+----+------------+
+Note: If you want to add a NULL/None-->then use-->lit(None)
+
+ii)Adding a new column based on another column
+   Generate 2 new columns--->Tax and netsal based on existing column-->Salary
+
+-------------------------------------------
+df5=df.withColumn("Tax",df.Salary*0.10)
+df5=df5.withColumn("NetSalary",df5.Salary-df5.Tax)
+df5.show()
+o/p:
++-----+-------+------+----------+---+----+------+---------+
+|Empid|Empname|Salary|  JoinDate|Sex|City|   Tax|NetSalary|
++-----+-------+------+----------+---+----+------+---------+
+|  101| Miller| 50000|2020-02-21|  M|pune|5000.0|  45000.0|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|6000.0|  54000.0|
+|  103|   Sony| 70000|2021-06-25|  F|pune|7000.0|  63000.0|
+|  104|   alia| 80000|2018-03-17|  F| hyd|8000.0|  72000.0|
++-----+-------+------+----------+---+----+------+---------+
+-----------------------------------------------------------------------------
+iv)Generating a new column based on condition
+   ex:Generate column Grade
+                  if sal>=70000----------------->Grade "A"
+                  if sal>=50000 and sal<70000--->Grade "B"
+                  else                       --->Grade "C"
+
+-----------------------------------------------------
+from pyspark.sql.functions import when,lit
+df.withColumn('GRADE',
+          when((df.Salary>=70000),lit("A"))
+          .when((df.Salary<70000) & (df.Salary>=50000),lit("B"))
+          .otherwise(lit("C"))).show()
+o/p:
+
++-----+-------+------+----------+---+----+-----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|GRADE|
++-----+-------+------+----------+---+----+-----+
+|  101| Miller| 50000|2020-02-21|  M|pune|    B|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|    B|
+|  103|   Sony| 70000|2021-06-25|  F|pune|    A|
+|  104|   alia| 80000|2018-03-17|  F| hyd|    A|
++-----+-------+------+----------+---+----+-----+
+==============================================================================
+lit() :lit() function is used to add a constant value  as a new column
+
+i)lit() function with select()
+------------------------------------------
+from pyspark.sql.functions import col,lit
+df2=df.select(col("Empid"),col("Empname"),col("Salary"),lit("IBM").alias("Company"))
+df2.show()
+o/p:
++-----+-------+------+-------+
+|Empid|Empname|Salary|Company|
++-----+-------+------+-------+
+|  101| Miller| 50000|    IBM|
+|  102|  Blake| 60000|    IBM|
+|  103|   Sony| 70000|    IBM|
+|  104|   alia| 80000|    IBM|
++-----+-------+------+-------+
+
+ii)lit() function with withColumn()
+------------------------------------------------------
+from pyspark.sql.functions import lit,col,when
+df3=df.withColumn("Loan_status",when(col("Salary")>60000,lit("Eligible")) \
+    .otherwise(lit("Not Eligible")))
+df3.show()
+o/p:
++-----+-------+------+----------+---+----+------------+
+|Empid|Empname|Salary|  JoinDate|Sex|City| Loan_status|
++-----+-------+------+----------+---+----+------------+
+|  101| Miller| 50000|2020-02-21|  M|pune|Not Eligible|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|Not Eligible|
+|  103|   Sony| 70000|2021-06-25|  F|pune|    Eligible|
+|  104|   alia| 80000|2018-03-17|  F| hyd|    Eligible|
++-----+-------+------+----------+---+----+------------+
+===============================================================================
+withColumnRenamed():
+     using this function,we can perform the following
+      i)to rename a column
+     ii)to rename multiple columns
+    iii)Dynamically rename all or multiple columns
+
+syntax: withColumnRenamed("oldcolname","newcolname"))
+
+-------------------------------------------------------------
+df4=df.withColumnRenamed("Empid","Ecode")
+df4.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Ecode|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 50000|2020-02-21|  M|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  104|   alia| 80000|2018-03-17|  F| hyd|
++-----+-------+------+----------+---+----+
+
+ii)renaming multiple columns
+   rename--->Salary to income
+             Sex to Gender
+--------------------------------------------------------
+df5=df.withColumnRenamed("Salary","Income").withColumnRenamed("Sex","Gender")
+df5.show()
+o/p:
++-----+-------+------+----------+------+----+
+|Empid|Empname|Income|  JoinDate|Gender|City|
++-----+-------+------+----------+------+----+
+|  101| Miller| 50000|2020-02-21|     M|pune|
+|  102|  Blake| 60000|2019-04-15|     M| hyd|
+|  103|   Sony| 70000|2021-06-25|     F|pune|
+|  104|   alia| 80000|2018-03-17|     F| hyd|
++-----+-------+------+----------+------+----+
+
+
+iii)to change all the columns in a DF
+
+newcolumns=["col1","col2","col3","col4","col5","col6"]
+df6=df5.toDF(*newcolumns)
+df6.printSchema()
+o/p:
+|-- col1: long (nullable = true)
+ |-- col2: string (nullable = true)
+ |-- col3: long (nullable = true)
+ |-- col4: string (nullable = true)
+ |-- col5: string (nullable = true)
+ |-- col6: string (nullable = true)
+
+df6.show()
+o/p:
++----+------+-----+----------+----+----+
+|col1|  col2| col3|      col4|col5|col6|
++----+------+-----+----------+----+----+
+| 101|Miller|50000|2020-02-21|   M|pune|
+| 102| Blake|60000|2019-04-15|   M| hyd|
+| 103|  Sony|70000|2021-06-25|   F|pune|
+| 104|  alia|80000|2018-03-17|   F| hyd|
++----+------+-----+----------+----+----+
+==============================================================================
+
+
+==============================================================================
+filter()
+ -we can perform the following
+1)Filter with column condition
+  Filter those emps whose salaries>60000
+---------------------------------
+df7=df.filter(df.Salary>60000)
+df7.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  104|   alia| 80000|2018-03-17|  F| hyd|
++-----+-------+------+----------+---+----+
+
+2)Filter only "male"emp records
+-------------------------------------
+df8=df.filter(df.Sex=='M')
+df8.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 50000|2020-02-21|  M|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
++-----+-------+------+----------+---+----+
+
+3)Filter those emps who belongs to other than "hyd" city
+
+------------------------------------------------
+df2=df.filter(df.City!="hyd")
+df2.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 50000|2020-02-21|  M|pune|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
++-----+-------+------+----------+---+----+
+Note: we can use comparision operators for filtering  >,<,>=,<=,==,!=
+------------------------------------------------------------------------------
+2)Filtering using col() function
+#Task: filter only "hyd" city employees
+
+df3=df.filter(col("City")=="hyd")
+df3.show()
+
+================================================================================
+3)Filtering with multiple conditions
+
+Task: I want those emps who belongs to hyd and their salaries should be above 
+50000
+
+df4=df.filter((df.Salary>50000) & (df.City=="hyd"))
+df4.show()
+
+==============================================================================
+4)Filter based on list values
+ isin() :using this function we can filter the elements which are in list
+         or which are not in list
+
+Task: If we have multiple cities,then filter only those emps who belongs to
+      the cities hyd,pune
+
+list1=["hyd","pune"]
+df5=df.filter(df.City.isin(list1))
+df5.show()
+-------------------------------------------------------------------------
+
+Task2:
+list2=["hyd"]
+Task: Filter those emps other than the city "hyd"
+df6=df.filter(df.City.isin(list2)==False)
+df6.show()
+------------------------------------------------------------------------
+Task3:
+
+Task: Filter those emps who belongs to the city "hyd"
+list2=["hyd"]
+df6=df.filter(df.City.isin(list2)==True)
+df6.show()
+-------------------------------------------------------------------------
+Task 4: Filter based on startswith,endswith
+df7=df.filter(df.Empname.startswith("M"))
+df7.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  101| Miller| 50000|2020-02-21|  M|pune|
++-----+-------+------+----------+---+----+
+---------------------------------------------------------------------------
+
+Task 5: filter those who joined in the year 2021
+        means here the joindate year should startwith with 2021
+
+df8=df.filter(df.JoinDate.startswith("2021"))
+df8.show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  103|   Sony| 70000|2021-06-25|  F|pune|
++-----+-------+------+----------+---+----+
+==============================================================================
+distinct() :For eliminating the duplicates
+
+data=[("Rahul","mrkt",30000),("Blake","sales",40000),("John","hr",50000),("Blake","sales",40000),("Rahul","mrkt",30000)]
+columns=["Empname","Dept","Salary"]
+df1=spark.createDataFrame(data=data,schema=columns)
+df1.show()
++-------+-----+------+
+|Empname| Dept|Salary|
++-------+-----+------+
+|  Rahul| mrkt| 30000|
+|  Blake|sales| 40000|
+|   John|   hr| 50000|
+|  Blake|sales| 40000|
+|  Rahul| mrkt| 30000|
++-------+-----+------+
+
+df2=df1.distinct()
+df2.show()
++-------+-----+------+
+|Empname| Dept|Salary|
++-------+-----+------+
+|  Rahul| mrkt| 30000|
+|  Blake|sales| 40000|
+|   John|   hr| 50000|
++-------+-----+------+
+
+==============================================================================
+#I want the count of employees
+
+print("No of Employees=",df2.count())
+o/p:
+No of Employees= 3
+
+==============================================================================
+dropDuplicates(): we can also remove the duplicates using this
+
+df3=df1.dropDuplicates()
+df3.show()
+o/p:
++-------+-----+------+
+|Empname| Dept|Salary|
++-------+-----+------+
+|  Rahul| mrkt| 30000|
+|  Blake|sales| 40000|
+|   John|   hr| 50000|
++-------+-----+------+
+
+==============================================================================
+df.sort(): 
+
+df.sort("Salary",ascending=False).show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  104|   alia| 80000|2018-03-17|  F| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  101| Miller| 50000|2020-02-21|  M|pune|
++-----+-------+------+----------+---+----+
+or
+
+df.sort(df.Salary.desc()).show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  104|   alia| 80000|2018-03-17|  F| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  101| Miller| 50000|2020-02-21|  M|pune|
++-----+-------+------+----------+---+----+
+
+--------------------------------------------------------------
+#sorting based on multiple columns
+df.sort(df.Salary.desc(),df.Empname.asc()).show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  104|   alia| 80000|2018-03-17|  F| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  101| Miller| 50000|2020-02-21|  M|pune|
++-----+-------+------+----------+---+----+
+
+==============================================================================
+#sort and col functions
+from pyspark.sql.functions import col
+df.sort(col("Salary").desc(),col("Empname").asc()).show()
+o/p:
++-----+-------+------+----------+---+----+
+|Empid|Empname|Salary|  JoinDate|Sex|City|
++-----+-------+------+----------+---+----+
+|  104|   alia| 80000|2018-03-17|  F| hyd|
+|  103|   Sony| 70000|2021-06-25|  F|pune|
+|  102|  Blake| 60000|2019-04-15|  M| hyd|
+|  101| Miller| 50000|2020-02-21|  M|pune|
++-----+-------+------+----------+---+----+
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

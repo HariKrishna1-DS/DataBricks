@@ -1,0 +1,20 @@
+
+
+
+1)json->df=spark.read.json("path") or spark.read.format("json").load("path")
+
+        df=spark.read.option("Multiline",True).json("path") 
+              
+2)csv--->spark.read.csv("path") or spark.read.format("csv").load("path")
+
+         spark.read.option("header",True) \
+                   .option("inferschema",True) \
+                   .csv("path") 
+
+3)text ------>spark.read.text("path") or spark.read.format("text").load("path")
+
+4)parquet---->spark.read.parquet("path") or spark.read.format("parquet").load("path")
+
+5)avro ----->spark.read.avro("path") or spark.read.format("avro").load("path")
+
+6)orc ------>spark.read.orc("path") or spark.read.format("orc").load("path")

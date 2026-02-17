@@ -1,0 +1,71 @@
+
+DBFS(DataBricks File System)
+----------------------------
+
+Access to your data-------->data sits in a directory
+
+---->we see the directory structure
+
+In Databricks cloud platform,data directory is available to us through the 
+databricks file system(DBFS)
+
+------------------------------------------------------------------------------
+here
+  -working with DBFS root
+  -how to use and access DBFS
+  -how to create sub-diectories,files,folders with DBFS
+  -mounting or map--->Azure cloud data storages with DBFS
+
+  -As we are in azure cloud,we will mount ADLS to DBFS and gain access to
+   cloud storage
+
+DBFS : It is a distributed file system integrated into databricks workspace
+       and available on databricks cluster
+
+-DBFS is a virtual file sytem that allows you to acces cloud storage
+ as a directory where you can create directories,sub-directories,files 
+
+For eVery Databricks workspace a DBFS directory(storage account) is created.
+
+-It is not recommended to use this DBFS root directory for storing your data
+ bcoz of many reasons
+ bcoz of not having full access or control on this storage account as it is
+ automatically created by databricks
+
+-So we create a seperate storage account in azure cloud(datalake) and create
+ a root directory there and mount to that root directory seperately and use
+ that.
+
+==============================================================================
+working with DBFS file system
+
+Goto--->Catalog--->we wont see any DBFS file browser-->As by defualt it
+                                                       is disabled
+So enable DBFS--->Goto the user-->i.emaiid--->setings---->
+Advanced---->DBFS File Browser--->enable
+
+No we can see the DBFS file browser in catalog
+
+Goto Azure portal--->All resources--->
+
+we see a default storage account created by databricks
+
+dbstorage----->type--->storage account---->for adb4pmresourcegroup
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

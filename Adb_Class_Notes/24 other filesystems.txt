@@ -1,0 +1,45 @@
+Other filesystems
+-----------------
+
+Do you have any other filesystems for databricks--->yes
+
+file:  local file system of driver nachine 
+
+    file: is another filesystem in databricks that allows us to access the 
+       local file system of the driver machine
+
+--------------------
+%fs ls file:/
+--------------------
+o/p:  we see the directories of local machine
+
+
+so
+1)dbfs
+2)local file system
+
+we have another filesytem command
+
+----------------------
+%fs mounts
+----------------------
+we see all the sub-directories mounted unter root directory
+
+here in the o/p :
+         /--->root directory also is mountrd
+
+/-->this dbfs root directory is mandatory
+
+
+for keeping project data--->we need to create a seperate new directory 
+that should be mounted on the top of root directory
+
+=============================================================================
+
+
+
+
+
+
+
+

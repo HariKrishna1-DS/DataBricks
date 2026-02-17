@@ -1,0 +1,61 @@
+
+Creating volumes under a database
+---------------------------------
+
+Volume--->for storing files
+          also we can create sub-directories and store files in it
+
+Syntax for creating volume
+create volume catalogname.databasename.volumename
+----------------------------------------------
+%sql
+create volume dev.demodb.volume_files
+-----------------------------------------------
+
+check--->Catalog exporer-->dev catalog--->demodb database-->we see volume_files
+
+click this--->volume_files--->we wont see any files as nothing is uploaded
+
+her we see---->"upload to volume"---->browse for files
+or
+
+also in the notebook--->File--->upload files to volume
+
+here we can write code for uploading, it will be done through UI only
+
+click--->"uplod to this volume"--->max 100 files with max 5GB can be upladed
+
+  browse--->orders.json
+
+Destination path:
+/Volumes/dev/demodb/volume_files/ --->here the files are stored
+
+Name              size
+orders.json
+
+--------------------------------------------------------------
+Listing the content of your volume
+----------------------------------------
+%fs ls /Volumes/dev/demodb/volume_files/
+------------------------------------------
+
+o/p:
+dbfs:/Volumes/dev/demodb/volume_files/ orders.json
+
+Stored within the dbfs root
+
+for this volume_files--->grant privilages
+but i have already given all privilages to demodb database
+
+here in unity catalog-->the privilages will be inherited to child
+
+If you give privilages to demodb database
+then the privilages will be applied to all the objects of demo_db database
+
+you can create volumes and you can grant permissions to ur users to access the
+volumes or to access the file in the volumes
+
+
+
+
+

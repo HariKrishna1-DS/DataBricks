@@ -1,0 +1,385 @@
+
+Mounting ADLS to DBFS:
+----------------------
+
+-Creating a Storage account(Datalake) and make it available to your dbfs storage
+
+
+-we need to mount our storage account to dbfs root directory so that we
+ can use our own storage account for keeping our data, which will be under
+ our control
+
+
+Mounting ADLS to DBFS :5 steps Process
+
+1)Create ADLS Gen2 storage account in Azure
+2)Create Storage Containers in your storage account
+3)Create Azure Service principal and secret
+        (Azure service principal--->It is a service user account)
+        (Secret-->is the password for service user account)
+
+4)Grant access to service principle for storage account
+   i,e giving permission to access the storage account or container
+
+5)Goto databricks-->mount storage container
+------------------------------------------------------------------------------
+
+Step 1: Creating ADLS Storage Account
+
+Resource group:adb6pm
+
+Storage account :mystoragelakeadb6pm
+
+Region :(US) East US
+         IT should be the same region where you created the workspace
+
+performance : standard
+
+Redundancy :select LRS(Locally redundant storage)--->lowest--->for learning go with this
+                   GRS(Geo-redundant storage(GRS)--->highest-->for project go with this
+                   to define , how fault-tolerant ur storage account is
+
+Next--->Advanced
+        Enable hierarchical namespace-->yes --->For datalake
+        if we select this means , we are selecting Data lake storage Gen2
+
+        Gen1 and Blob storage are not recommended for data storage
+        Datalake Gen2 is specifically designed for storage.
+
+
+ Review+create--->Create
+-------------------------------------------------------------------------------
+step 2 :Creating a container in your storage account
+
+mystoragelakeadb6pm---->containers--->Name:dbfscontainer--->create
+
+------------------------------------------------------------------------------
+step 3:
+
+Create Azure service principal (or)user ----->set password/secret
+
+and that user will have access to storgecontainer and then we use that
+username and password i.e service principal and secret from databricks 
+workspace i,e from dbfs to access the storage container 
+
+Goto--->Microsoft EntraID 
+        -->bcoz all the users or service principals are created here
+
+open Azure home---->Microsoft EntraID--->click it
+
+
+we doesnt want to create a simple user account-->
+              we want to create a service account
+              we want to create a Application user-->
+
+click--->+Add---->App Registrations---->
+
+Name:databricks-app-principal6pm
+
+click-->Register
+
+It creates--->databricks-app-principal6pm
+here app registration is done
+
+we see the following
+
+Display name :databricks-app-principal6pm
+Application (client) ID:3666e38a-ef67-4d32-ac4c-4903a116d654
+Object ID:5bbc85fb-cafa-402b-829a-f5e1076206e3
+Directory (tenant) ID:e13e1228-44b3-4b28-a7da-ff526b57c29b
+
+here service principal is created
+copy the Application ID for future use
+
+=============================================================================
+Creating certificates and secrets
+
+click that--->databricks-app-principal6pm--->
+
+at left side---we see---->certificates and secrets---->click
+
+-->+new client secret--->
+    Add a client secret
+           Descrition :databricks-app-principal6pm-secret 
+           Expires : 3months(90 days)
+
+  click--->ADD
+
+we see this
+
+Description                  Expires        Value        
+databricks-app-principal6pm-secret 2/28/2025  HN68Q~Eidy91teiaKVpmBWyGKVS~-sFTPPndAc48
+Secret ID :7322ae06-f701-4da3-83b1-94a1d1f28fe6
+
+value is like a password-->save this in a notepad bcoz we cant see it later
+
+------------------------------------------------------------------------------
+step 4:
+   Grant access to service principal to access storage account
+   whatever principal we created
+   we need to grant access to it 
+   to access the storge account.
+
+Goto the storage account-->here we grant access to service principal
+
+Goto---->Access control(IAM)-->+Add-->Add role assignment--->Role--
+          we can select some pre-defined roles
+
+search :Storage Blob Data Contributor       
+        this service principal will become the contributor for the
+        storage account-->It can create folder,files, etc
+
+select-->Storage Blob Data Contributor ---->Next
+
+members--->click select members---->
+          at righ side--->it shows the user accounts--->
+           but we dont want to grant access to these users
+we need to grant access to--->databricks-app-principal that we created
+
+at top right we see
+
+select members
+search: databricks-app-principal6pm
+       select-->databricks-app-principal6pm
+       click--->select
+
+we see the folowing
+
+
+Name                      Object ID                              Type
+databricks-app-principal6pm  8f0b0049-309a-4a8e-942e-fb2c19035a34   App
+
+Review + Assign--->click for 2 times
+
+It adds the role assignment
+-------------------------------------------------------------------------------
+Step 5: mount storage container
+
+to mount that directory in databricks--->we need to use an API
+
+check the documentation--->
+open google and search :documentation to mount ADLS to DBFS
+
+we see mount configs for python/scala
+
+copy the mont configs of python to a seperate notebook cell
+
+
+---------------------------------------------------------
+#Define the mount configs
+configs = {"fs.azure.account.auth.type": "OAuth",
+          "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+          "fs.azure.account.oauth2.client.id": "<application-id>",
+          "fs.azure.account.oauth2.client.secret": dbutils.secrets.get(scope="<scope-name>",key="<service-credential-key-name>"),
+          "fs.azure.account.oauth2.client.endpoint": "https://login.microsoftonline.com/<directory-id>/oauth2/token"}
+
+----------------------------------------------------------------------------
+mount the container:
+in another cell
+
+------------------------------------------------------------
+#mount the container of storage account:
+dbutils.fs.mount(
+  source = "abfss://<container-name>@<storage-account-name>.dfs.core.windows.net/",
+  mount_point = "/mnt/<mount-name>",
+  extra_configs = configs)
+
+-------------------------------------------------------------
+
+
+1st line--->OAuth--->is the protocol
+2nd line--->who is the provider--->provider type -->we see the package
+3,4,5th line-->for Authentication,
+               we need to provide the client id,secret and endpoint
+
+so for providing all these--->I will create seperate variables in a new cell
+at the top of all these cells..
+--------------------------------------------------
+#Defining necessary variables
+
+storage_account_name = "mystoragelakeadb6pm"
+container_name="dbfscontainer1"
+mount_point="myfiles"    --->we can provide any name (i.e data directory) 
+client_id="3666e38a-ef67-4d32-ac4c-4903a116d654"  ---->Applicationid
+tenant_id="e13e1228-44b3-4b28-a7da-ff526b57c29b"  ---->directoryid
+client_secret="HN68Q~Eidy91teiaKVpmBWyGKVS~-sFTPPndAc48"
+--------------------------------------------------
+
+To get the client id--->
+     Goto Microsoft Entra id--->>Manage--->All applications
+                            here we see-->1 application
+  Display name                  Application (client) ID
+databricks-app-principal6pm :  3666e38a-ef67-4d32-ac4c-4903a116d654
+
+click--->databricks-app-principal6pm-->we see all the details such as
+
+client id
+Directory(tenant)id
+
+copy these client id and tenant id values  as 2 seperate variables
+client_secret is that which we copied seperately-->only one time generated
+
+=============================================================================
+adding these variables values within the mount configs
+
+
+-----------------------------------------------------------------------------
+#Define the mount configs
+configs = {"fs.azure.account.auth.type": "OAuth",
+          "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+          "fs.azure.account.oauth2.client.id": f"{client_id}",
+          "fs.azure.account.oauth2.client.secret": f"{client_secret}",
+          "fs.azure.account.oauth2.client.endpoint": f"https://login.microsoftonline.com/{tenant_id}/oauth2/token"}
+
+-----------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+#mount the container of storage account:
+dbutils.fs.mount(
+  source = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/",
+  mount_point = f"/mnt/{mount_point}",
+  extra_configs = configs)
+---------------------------------------------------------------------------
+--------------------------------------------------------------------------
+#mount the container of storage account:
+container_name=raw_data      #raw_data container should already be created
+dbutils.fs.mount(
+  source = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/",
+  mount_point = f"/mnt/raw_data",
+  extra_configs = configs)
+--------------------------------------------------------------------------
+container_name=Processed_data      #processed_data container should already be created
+dbutils.fs.mount(
+  source = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/",
+  mount_point = f"/mnt/processed_data",
+  extra_configs = configs)
+-----------------------------------------------------------------------------
+Run the cells---->one by one
+
+TRue--->sucessfull
+
+Mounting--->successfull
+
+afte mounting-->check it-->
+
+-------------------------------------------------------------------
+list contents of your mount point
+%fs ls /mnt
+
+o/p: myfiles
+     raw_data
+     processed_data
+
+--------------------------------------------------------------------
+
+Upload files to your mounted location:
+-------------------------------------
+
+Goto Storageaccount--->
+mystoragelakeadb6pm--->containers-->dbfscontainer1--->add directory->sampledata
+--->upload--->products.json
+mystoragelakeadb6pm--->containers-->raw_data--->add directory->sampledata
+--->upload--->products.json
+
+the mount point is--->files(data directory)
+                      within this we can see our strorage account directory
+Storage account directory is mounted to a directory--->files
+
+Goto Notebook
+
+--------------
+%fs ls /mnt/myfiles/
+------------------
+or
+--------------
+%fs ls /mnt/raw_data/
+------------------
+we get o/p as-->sampledata---->it is a directory we created from backend
+within the storage account and we are accessing from databricks workspace
+
+To see the contents of storage account directory
+------------------------
+%fs ls /mnt/myfiles/sampledata
+---------------------------
+or
+------------------------
+%fs ls /mnt/raw_data/sampledata
+---------------------------
+
+o/p-->products.json
+
+we see our directory mounted to the location-->dbfs://mnt/files/sampledata/products.json
+
+
+-->If you want to unmount-->we use unmount command
+
+-----------------
+%fs unmount /mnt/myfiles
+---------------------
+
+o/p--> /mnt/files is unmounted
+
+check it--->
+------------------------
+%fs ls /mnt/myfiles
+------------------------
+FileNotFoundException: No such file or directory /mnt/files
+
+It doesnt mean that you have lost your data
+
+Your data is seperate--->in datalake
+
+if you want to use on databricks--->we can mount
+                                  or if you dont want--->unmount
+
+
+if you want to mount again--->run the cell again
+
+-----------------------------------------------
+#mount the container of storage account:
+dbutils.fs.mount(
+  source = f"abfss://{container_name}@{storage_account_name}.dfs.core.windows.net/",
+  mount_point = f"/mnt/{mount_point}",
+  extra_configs = configs)
+------------------------------------------------
+
+Now list contents of your mount
+--------------------------------
+%fs ls /mnt/myfiles
+--------------------------------
+o/p we see the sampledata directory of storage account
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

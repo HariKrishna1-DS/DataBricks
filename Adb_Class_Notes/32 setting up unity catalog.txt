@@ -1,0 +1,102 @@
+Setup Unity Catalog Metastore (and adding workspaces to it).
+---------------------------------------------------------
+
+Goto Databricks Account console--->
+
+https://accounts.azuredatabricks.net/--> enter externaluser and pwd-->
+
+
+click--->catalog--->click "create metastore"--->
+
+Name(for metastore): adb9am-meta
+
+Region :Eastus
+
+ADLS Gen 2 path:
+syntax:
+<container_name>@<storage_account_name>.dfs.core.windows.net/<path>
+Optional location for storing managed tables data across all catalogs in 
+the metastore.
+
+type this-->
+metastore-root@mystoragelakeadb9am.dfs.core.windows.net/ 
+here / -->mandatory which is the root directory
+
+do not grant users direct access to this path
+
+instead of giving entire acces of root container, create a directory
+and give access to it only, as shown below..
+
+metastore-root@mystoragelakeadb9am.dfs.core.windows.net/directoryname
+
+but here am giving access to entire container
+
+
+next-->Access Connector id (Resource id of our access connector)
+
+Goto resource-->adb9am-->we see-->databricks_access_connector-->click it
+
+copy the ResourceID--->/subscriptions/65350b18-9cdf-41e5-9918-7ec1b910a1da/resourceGroups/adb9am/providers/Microsoft.Databricks/accessConnectors/databricks_access_connector
+
+Access Connector id:
+/subscriptions/65350b18-9cdf-41e5-9918-7ec1b910a1da/resourceGroups/adb9am/providers/Microsoft.Databricks/accessConnectors/databricks_access_connector
+
+click-->create
+
+metastore is created successfully
+
+Next assign metastore(adb9am-meta) to the workspaces
+
+Name            Status  Pricingtier  Resourcegroup  Region Created   Metastore
+myworkspace9am  Running Premium      adb9am         eastus 11/22/2024 metastore_azure_eastus
+
+select the checkbox before myworkspace9am and--> click-->assign-->enable->close
+means we are assigning the workspace/workspaces to metastore(adb9am-meta) 
+
+
+Generally we have dev workspace
+                  QA    "
+                  prod  "
+
+select all and assign to this metastore
+
+we will have centralized unity catalog for the entire project and
+mange permission for all environmentfrom s single place
+
+click--> adb9am-meta
+here we see 1)configurations
+            2)workspaces
+
+in Configurations-->
+ADLS Gen2 path-->
+abfss://metastore-root@mystoragelakeadb9am.dfs.core.windows.net/1ea61bc2-d47b-4d02-bebf-ff54fdcaa4fc
+
+This is the locatoion where the unity catalog will keep the metadata
+
+metastore-root is---->containername
+
+mystoragelakeadb9am-->storage Account name
+
+dfs.core.windows.net--->url to access the storage acoount
+
+1ea61bc2-d47b-4d02-bebf-ff54fdcaa4fc-->directory which is created automatically
+                         by the databricks unity catalog inside the container 
+
+
+Metastore Admin-->edit-->we can change the admin also
+
+allow delta sharing--->disable as of now
+
+click-->catalog-->adb9am-meta --->now click workspaces
+
+ -It displays all the workspaces connected with the metastore
+
+This is creating metastore and adding workspaces to this metastore
+
+===============================================================================
+
+
+
+
+
+

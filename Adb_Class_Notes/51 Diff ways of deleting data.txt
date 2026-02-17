@@ -1,0 +1,130 @@
+
+Delta table delete:
+------------------
+
+I-method : sql style
+
+-----------------------------------------
+%sql
+delete from dev.demodb.emp4 where eid=107;
+-----------------------------------------
+
+-----------------------------------------
+%sql
+select * from dev.demodb.emp4;
+-----------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+104	Rajesh	40000	M	13
+105	Ramesh	50000	M	12
+105	Ramesh	50000	M	12
+106	Pavan	60000	M	11
+106	Pavan	60000	M	11
+106	Pavan	60000	M	11
+106	Pavan	60000	M	11
+
+=============================================================================
+method 2: spark sql
+
+------------------------------
+spark.sql("delete from dev.demodb.emp4 where eid=106 ")
+------------------------------------------------------
+
+-----------------------------------------
+%sql
+select * from dev.demodb.emp4;
+-----------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+104	Rajesh	40000	M	13
+105	Ramesh	50000	M	12
+105	Ramesh	50000	M	12
+
+=============================================================================
+method 3: Pyspark Delta Table instance
+
+--------------------------------------------------------------------
+from delta.tables import *
+from pyspark.sql.functions import *
+
+deltatable_instance=DeltaTable.forName(spark,"dev.demodb.emp4")
+deltatable_instance.delete("eid=105")
+--------------------------------------------------------------------
+
+-----------------------------------------
+%sql
+select * from dev.demodb.emp4;
+-----------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+104	Rajesh	40000	M	13
+
+ex:2 multiple conditions using sql predicate
+
+-----------------------------------------------------------
+deltatable_instance.delete("eid=104 and ename='Rajesh'")
+
+------------------------------------------------------------
+o/p:
+
+-----------------------------------------
+%sql
+select * from dev.demodb.emp4;
+-----------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+
+ex:3 Pyspark delta table instance -spark sql predicate
+    #Declare the predicate by using spark sql functions
+
+----------------------------------------
+deltatable_instance.delete(col("eid")==103)
+------------------------------------------
+
+-----------------------------------------
+%sql
+select * from dev.demodb.emp4;
+-----------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,76 @@
+
+
+
+
+#creating a delta table by loading from a json file
+#step 1: Goto dbfscontainer->jsondata-->upload a file-->flight-time.json
+-----------------------------------------------------------------------------
+base_dir=base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+
+
+#Step 2: Creating catalog
+spark.sql("CREATE CATALOG IF NOT EXISTS dev")  (already available)
+
+#Step 3: Creating database within the catalog
+spark.sql("CREATE DATABASE IF NOT EXISTS dev.demodb") (already avaialble)
+
+#Step 4: providing schema
+flight_schema='''FL_DATE DATE,
+                OP_CARRIER STRING,
+                OP_CARRIER_FL_NUM INT,
+                ORIGIN STRING,
+                ORIGIN_CITY_NAME STRING,
+                DEST STRING,DEST_CITY_NAME STRING,
+                CRS_DEP_TIME INT,DEP_TIME INT,
+                WHEELS_ON INT,
+                TAXI_IN INT,
+                CRS_ARR_TIME INT,ARR_TIME INT,
+                CANCELLED INT,
+                DISTANCE INT'''
+
+#Step 5: Creating dataframe
+flight_time_df=(spark.read.format("json")
+                .schema(flight_schema)
+                .option("dateformat","m/d/y")
+                .load("basedir"+"jsondata/flight-time.json")
+flight_time_df.show()  
+
+#Step 6: Creating Delta Table
+flight_time_df.write.format("delta").mode("overwrite").saveAsTable("dev.demodb.flight_time_tbl")
+
+
+Delta table is created
+
+#Now reading delta table
+1) using spark sql
+
+--------------------------------------------
+%sql
+select * from dev.demodb.flight_time_tbl;
+--------------------------------------------
+
+#Now reading delta table
+1) using Dataframe API
+---------------------------------------------------
+spark.read.format("delta").table("dev.demodb.flight_time_tbl").display()
+#or
+spark.read.format("delta").table("dev.demodb.flight_time_tbl").show()
+----------------------------------------------------
+
+creating a delta table from another delta table-->CTAS(CREATE-TABLE-AS-SELECT)
+spark.sql("CREATE TABLE IF NOT EXISTS dev.demodb.flight_time_tbl2 AS SELECT * FROM dev.demodb.flight_time_tbl")
+
+-----------------------------------------------------
+%sql
+select * from dev.demodb.flight_time_tbl2;
+-----------------------------------------------------
+or
+
+-----------------------------------------------------
+spark.read.format("delta").table("dev.demodb.flight_time_tbl2").write.format("delta").mode("overwrite").saveAsTable("dev.demodb.flight_time_tbl3")
+<---------------------------df-------------------------------->
+
+-----------------------------------------------------
+%sql
+select * from dev.demodb.flight_time_tbl3;
+-----------------------------------------------------

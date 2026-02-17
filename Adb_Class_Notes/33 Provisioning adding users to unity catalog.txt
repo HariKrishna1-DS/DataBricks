@@ -1,0 +1,240 @@
+
+Provisioning of your users to unity Catalog:
+-------------------------------------------
+
+-bringing users to unity catalog and
+-grant privilages
+-working with user groups
+
+-we need to bring our enterprise users to unity catalog
+ provision of your company users to unity catalog
+
+ -here we see how to bring the company users or domain users into 
+  databricks unity catalog, so that we can maintain user groups and 
+  provide privilages to that user groups and individual user
+
+how to bring users to ur unity catalog
+--------------------------------------
+step 1: Get SCIM connection details
+        ---------------------------
+
+SCIM --->System for cross-domain Identity management
+         SCIM is designed to mange user identities in cloud-based applications
+         SCIM is a protocol to bring users from one domain to other domain
+
+         i.e how cross-domain user mgmt works
+
+ Databricks also allows same protocol (or) connection
+
+-here we use SCIM connector to bring users from one domain to 
+ databricks workspace
+
+Get SCIM connection details:
+---------------------------
+Goto databricks account console--->
+click security--->
+click-->user provisioning--->setup user provisioning--->
+
+It Generates
+1)SCIM TOKEN-->dsapiec1f30332ec9bf579fad2c511a08c85c
+
+2)SCIM URL-->https://accounts.azuredatabricks.net/api/2.1/accounts/d7cb521a-7475-4112-bfa9-b760437847ed/scim/v2
+
+click --->done
+
+Copy the above SCIM URL and SCIM Token into some notepad for future use
+as it is token-->we wont see it again
+if forgot to copy-->we need to regenerate again.
+
+we will take this token and URL and 
+we will go the the Active Directory/Corporate Active Directory to sink/push
+the users from corporate Active directory to unity catalog
+
+our basic Active directory will push the users to the unity catalog
+
+------------------------------------------------------------------------------
+step 2: Sync corporate users from ur active directory to unity catalog
+Goto Microsoft Entra ID(Active Directory)---->
+
+click-->Manage-->
+click-->Enterprise Applications(at left side)--->
+
+click--->+New Application---->
+
+search-->"Azure Databricks SCIM provisioning connector"-->select it-->create
+
+Adding Application
+
+Let the connector get added to my Active Directory
+
+here we are provisioning users b/w Active Directory and unity catalog
+
+after it get added--->
+we get name,ApplicationId and objectID
+
+Next-->in the same SCIM provisioning connector page-->
+click--->provision user account(Get started)-->
+
+click--->New Configuration-->
+It asks for Admin credentials
+
+Tenant URL->paste SCIM URL here
+https://accounts.azuredatabricks.net/api/2.1/accounts/d7cb521a-7475-4112-bfa9-b760437847ed/scim/v2
+
+secret token-->paste secret token here
+dsapiec1f30332ec9bf579fad2c511a08c85c
+
+click-->Test Connection 
+
+testing whether Active directory is connecting to Databricks platfor
+
+in notification we see-->
+The supplied credentials are authorized to enable provisioning
+
+Click-->create
+successfully created provisional configuration for DAtabricks SCIM provisioningconnector
+=============================================================================
+Next--->which users do you want to push to the unity catalog
+
+click-->all applications(at top) within "SCIM provisioning Connector" page--->
+Refresh--->
+we get--->Azure DAtabricks SCIMprovision connector--->click
+click--->Assign users and groups---->click-->add user/group---->
+
+click--->users->"none selected"-> click--->select desired users from the available list
+here i see only 2users
+but for company,we have 100's of users
+
+we can also choose user groups, instead of choosing individual users
+
+but for doing that you need to have advanced level of Active diectory subscription
+
+-here i have basic Active Directory subscription
+ here i cannot push a user grouo but only push selected users
+
+now push the selected users
+select-->
+Name                  Type        Details
+N VIJAYA SAGAR        User     vijayhadooptrainings2@gmail.com---->select
+
+am already there in unity catalog, as am the owner of the databricks instance
+so try pushing diff user
+
+click-->select
+it says--->1 user selected
+click-->assign
+
+we get-->
+Display Name               Object Type        Role assigned
+N VIJAYA SAGAR               User                 User
+
+Now this user is the memeber of this provisioning connector and this user 
+can be pushed into unity catalog
+
+at left side--->"Provisioning"--->click--->"start provisioning--->
+it says satarted provisioning--->Start
+still if it wont get start option--->stop provisioning and again -->click restart provisioning
+and click---> overview (at left side)
+it says-->
+current cycle status
+-Initial cycle not run
+it is running initial cycle(it runs after some time)
+-->refresh the page and check-->it says
+Current cycle status:
+Initial cycle completed(100% complete)
+
+USERS--->1
+
+we kept automatic provisioning-->
+so that it keep on provisioniong more users
+
+as soon as you add new users in the same group-->it automatically provision them
+
+
+if you add one more user(going back and select one more user)---->
+then automatically it will provision
+
+now come to databricks accounts console--->
+
+click user management--->we see the user getting added into the list
+                         Now the user is part of unity catalog
+                         am already there bcoz -->as i am the owner
+
+we are done with user provisioning(i.e adding users to unity catalog)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

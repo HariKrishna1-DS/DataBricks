@@ -1,0 +1,161 @@
+
+Databricks Unity Catalog:
+------------------------
+using this we perform the following
+1)metadata management
+2)User management
+3)Fine-Grained Access control
+
+
+Unity Catalog---for metadata store -->for storing all the metadata information
+                here we can create catalogs
+                the 1st level of objects,we create within unity catalog is catalog
+
+            we can create catalogs based on project
+            project1 --->1 catalog
+            project2 --->1 catalog
+ 
+            projectn---->1 catalog
+
+           i,e 1 catalog for each project or we can create multiple catalogs
+           for diff environments like DEV,QA,PROD
+
+
+for 1 project---->we have 3 environments--->1)DEV--->one catalog-->databases
+                                            2)QA --->one catalog-->  "
+                                            3)PROD-->one catalog-->  "
+
+
+In databricks----->Databases or schema both are same
+
+again in database-->we can create-->1)Tables
+                                    2)views
+                                    3)Functions
+                                    4)Volumes
+
+There are 2 types of tables in spark
+
+1)Unmanaged tables or External tables
+
+2)managed tables or internal tables
+
+Tables and Volumes are 2types of objects for storing data physically
+
+Tables:
+------
+In tables,data is stored in tabular form as a table and data stored in 
+data files behind the tables
+
+If you want to acces the data--->through tablename
+Tables are of 2 types
+1.managed or internal tables: If you drop a table then both metadata and data             
+                             both are dropped.
+
+2.un-managed  tables or external tables: If you drop a table then only 
+                     metadata will be deleted but still the data remains
+
+
+volumes:
+-------
+-These are another type of storage objects-->which can store data files directly
+
+Spark supports storing data in form of tables and working with datafiles such as
+parquet file,CSV file,avro file etc
+
+Volumes are of 2 types:
+1.un-managed volume :If you delete a volume then spark deletes only metadata 
+                    but still the data remains
+
+2.managed volume: If you delete a volume then spark deletes both metadata and 
+                  data
+
+===============================================================================
+unity catalog also allows us to create locations or external locations nothing 
+but directories
+
+in dbfs--->we mounted a directory i,e cloud storage container as a directory
+           on dbfs
+
+same way-->we can do using unity catalog
+
+For accessing the directories(locations),we require storage credentials
+
+so we use unity catalog insted of dbfs mounts and we grant permissions 
+just like sql and provide privilages /mode
+
+i.e read mode on storagelocations/tables/views/functions
+or change to other mode-->write mode to a user group
+
+unity catalog also need to manage user accounts
+
+-we import user from the Active directory(microsoft EntraID)
+
+ we bring user into unity catalog
+
+or we can directly create user in unity catalog
+
+but generally we bring the existing enterpise users into unity catalog
+
+also grant privilages--->all these privilages are stored in unity catalog metastore
+
+unity Catalog is a complete solution for
+  
+     -metadata mgmt
+       -user mgmt
+       -access mgmt    for all the environements
+
+based on enviroments,we can create multiple catalogs for each project
+
+============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

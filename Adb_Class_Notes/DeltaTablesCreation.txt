@@ -1,0 +1,175 @@
+base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+df=spark.read.json(base_dir+"jsondata/emps.json")
+df.show()
+
+O/P
+--------
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+
+
+#Creating Datatables- Two Ways
+#1. SQL Approach
+#2.PySPark Approach
+
+#1. Using SQL Approach
+%sql
+--Creating Using Sql Approach
+CREATE TABLE IF NOT EXISTS dev1.demodb.emp1(eid INT, ename STRING, sal INT, sex STRING, dno INT) using delta;
+
+
+%sql
+INSERT INTO dev1.demodb.emp1 VALUES (101 ,'Mahendra',50000,'M',10),(102 ,'Ravi',60000,'M',11),(103 ,'Priya',55000,'F',12),(104 ,'Rajesh',65000,'M',13),(105 ,'Priyanka',50000,'F',14)
+
+
+%sql
+SELECT * FROM dev1.demodb.emp1
+
+O/P
+-----------------
+eid	ename	sal	sex	dno
+101	Mahendra	50000	M	10
+102	Ravi	60000	M	11
+103	Priya	55000	F	12
+104	Rajesh	65000	M	13
+105	Priyanka	50000	F	14
+
+
+#Another way of creating delta table using Dataframe API
+#Dataframe O/p Save as a table
+
+df.write.format("delta").mode("append").saveAsTable("dev1.demodb.emp2")
+
+
+
+#Another way of creating delta tables using PySpark Approach
+
+spark.sql("create table if not exists dev1.demodb.emp3 using delta as select * from dev1.demodb.emp2")
+
+
+%sql
+SELECT * FROM dev1.demodb.emp3
+
+o/p
+
+dno	eid	ename	sal	sex
+11	101	Miller	10000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	50000	m
+
+
+
+
+spark.sql("use dev1.demodb")
+spark.sql("show tables").display()
+spark.sql("select * from emp3").display()
+
+
+O/p
+
+database	tableName	isTemporary
+demodb		emp1		false
+demodb		emp2		false
+demodb		emp3		false
+
+
+dno	eid	ename	sal	sex
+11	101	Miller	10000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	50000	m
+
+
+
+
+#Spark Approach of Creating Table with custom schema
+spark.sql("CREATE CATALOG if not exists dev2")
+spark.sql("create database if not exists dev2.demodb")
+spark.sql("create table emp4 (eid integer, ename string, sal integer, sex string, dno integer) using delta")
+spark.sql("show tables").display()
+spark.sql("select * from emp4").display()
+  
+
+O/p
+-----------
+database	tableName	isTemporary
+default	emp4	false
+
+
+
+
+df.write.format("delta").mode("append").saveAsTable("dev2.demodb.emp4")
+spark.sql("select * from dev2.demodb.emp4").display()
+
+
+O/P
+--------------------------
+
+dno	eid	ename	sal	sex
+11	101	Miller	10000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	50000	m
+
+
+
+
+
+#Without using create table statement and I want custom schema
+from pyspark.sql.types import StructType,StructField,IntegerType,StringType   
+schema1=StructType([
+    StructField("eid", IntegerType(), True),
+    StructField("ename", StringType(), True),
+    StructField("sal", IntegerType(), True),
+    StructField("sex", StringType(), True),
+    StructField("dno", IntegerType(), True)])
+ #Another way
+schema2='''
+ eid int,
+ ename string,
+ sal int,
+ sex string,
+ dno int
+ '''
+df=spark.read.format("json").schema(schema1).load(base_dir+"jsondata/emps.json")
+ #df=spark.read.format("json").schema(schema2).load(base_dir+"jsondata/emps.json")         
+df.write.format("delta").mode("append").saveAsTable("dev2.demodb.emp5")
+spark.sql("select * from dev2.demodb.emp5").display()
+
+O/P
+---------------------
+
+eid	ename	sal	sex	dno
+101	Miller	10000	m	11
+102	Blake	20000	m	12
+103	Sony	30000	f	11
+104	Sonia	40000	f	12
+105	James	50000	m	13
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

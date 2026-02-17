@@ -1,0 +1,152 @@
+
+
+Creating External locations and External tables
+-----------------------------------------------
+step 1: Create External location
+
+step 2: Share/save data in delta format
+
+
+
+step 1: Create External location
+        creating external location-->require storage credentials
+
+Goto catalog-->connect--->External locations--->
+
+       we see the following
+
+Name--->external-data6pm
+
+Credential-->1ea61bc2-d47b-4d02-bebf-ff54fdcaa4fc-storage-credential-1733807673697
+
+url--->abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/
+
+click-->external-data6pm--->
+
+click-->Credential-->1ea61bc2-d47b-4d02-bebf-ff54fdcaa4fc-storage-credential-1733807673697
+and we see ...--> Rename to--->adb6pm-storage-credential
+
+
+I have already have a storage credential--->
+this got  automatically created with default name when we created
+databricks access connector
+
+now we renamed to--->adb6pm-storage-credential
+
+previusly we created this external location-->using unity catalog explorer
+
+by clicking the -->"create External location" button
+
+
+
+but now we create external location using code
+
+For creating external location,2 things are required
+
+1)URL  --->"abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/"
+           copy this
+           here /-->indicates root directory
+           here abfss-->is the qualifier
+         
+2)Storage credential--->adb6pm-storage-credential
+
+URL should be created in the format of file qualifier(abfss)
+we want to create external location in azure data lake
+in datalake-->we already have --->dbfs-container1
+
+creating external location in  this container itself
+
+Now create a directory with the name(external) within this dbfscontainer1
+
+goto dbfscontainer1--->+add directory-->Name:external--->save
+
+Now creating external location
+
+--------------------------------------
+%sql
+CREATE EXTERNAL LOCATION IF NOT EXISTS `external-data6pm`
+URL "abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/external"
+WITH (CREDENTIAL `adb6pm-storage-credential`)
+
+------------------------------------------------
+
+-----------------------------------------------------------------------------
+%fs ls abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/external
+------------------------------------------------------------------------------
+empty -->no data
+
+
+creating a Dataframe
+------------------------------------------------------------------------------
+#step 1: Goto dbfscontainer->jsondata-->upload a file-->flight-time.json
+-----------------------------------------------------------------------------
+base_dir=base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+
+#Step 2: providing schema
+flight_schema='''FL_DATE DATE,
+                OP_CARRIER STRING,
+                OP_CARRIER_FL_NUM INT,
+                ORIGIN STRING,
+                ORIGIN_CITY_NAME STRING,
+                DEST STRING,DEST_CITY_NAME STRING,
+                CRS_DEP_TIME INT,DEP_TIME INT,
+                WHEELS_ON INT,
+                TAXI_IN INT,
+                CRS_ARR_TIME INT,ARR_TIME INT,
+                CANCELLED INT,
+                DISTANCE INT'''
+
+#Step 3: Creating dataframe
+flight_time_df=(spark.read.format("json")
+                .schema(flight_schema)
+                .option("dateformat","m/d/y")
+                .load("base_dir"+"jsondata/flight-time.json")
+flight_time_df.show()  
+
+------------------------------------------------------------------------------
+#Step 4:
+Now saving data in delta format in External Location
+
+------------------------------------------------------------------------------
+flight_time_df.write.format("delta").mode("overwrite") \
+                .save("abfss://dbfscontainer1@mystoragelakeadn6pm.dfs.core.windows.net/external/flight-time")
+#or
+flight_time_df.write.format("delta").mode("overwrite") \                
+               .save(base_dir+"external/flight-time1")
+-------------------------------------------------------------------------
+in the dbfscontainer---->external--->
+                      we see 2 subfolders--->1)flight-time -->we see part files of type parquet
+                                             2)flight-time1-->         "   "
+---------------------------------------------------
+%fs ls abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/external/flight-time
+---------------------------------------------------
+o/p:
+part-00000
+part-00001
+part-00002
+part-00003
+
+If i save a DF to a location(external)
+it create 'n' no of files
+they are equal to number of partitions in DF
+
+If you dont want those many files or partitions--->
+we have coalesce() to decrease the partitions hence decreases the files
+
+goto backend external folder-->delete all part files
+now execute the following 
+--------------------------------------------------
+flight_time_df.coalesce(1) \
+                .write.format("delta") \
+                .mode("overwrite") \
+                .save("abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/external/flight-time1")
+
+---------------------------------------------------
+---------------------------------------------------
+%fs ls abfss://dbfscontainer1@mystoragelakeadb6pm.dfs.core.windows.net/external/flight-time1
+---------------------------------------------------
+o/p:
+part-00000
+
+now we see only one file
+

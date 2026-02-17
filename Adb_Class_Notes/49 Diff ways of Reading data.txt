@@ -1,0 +1,79 @@
+
+CRUD Operations
+C-CREATE
+R-READ
+U-UPDATE
+D-DELETE
+
+Different ways on Reading data from delta table
+
+Step 1: Create Delta Table
+
+----------------------------------
+from delta.tables import *
+
+DeltaTable.create(spark) \
+     .tableName("dev.demodb.emp4") \
+     .addColumn("eid","INT") \
+     .addColumn("ename","STRING") \
+     .addColumn("sal","DOUBLE") \
+     .addColumn("sex","STRING") \
+    .addColumn("dno","INT") \
+    .execute()
+--------------------------------------
+
+Step 2: inserting data(sql style)
+
+---------------------------------------------
+%sql
+insert into dev.demodb.emp4 values (101,"Raj",50000,"M",11),(102,"Ravi",60000,"M",12),(103,"Suresh",70000,"M",13);
+---------------------------------------------
+=========================================================================
+Step 3: Retrieving data
+1)sql style
+----------------------------
+%sql
+select * from dev.demodb.emp4;
+------------------------------
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+==============================================================================
+2)pyspark style
+  -------------
+ i)using show() method
+spark.sql("select * from dev.demodb.emp4").show()
++---+------+-------+---+---+
+|eid| ename|    sal|sex|dno|
++---+------+-------+---+---+
+|101|   Raj|50000.0|  M| 11|
+|102|  Ravi|60000.0|  M| 12|
+|103|Suresh|70000.0|  M| 13|
++---+------+-------+---+---+
+#or
+spark.read.format("delta").table("dev.demodb.emp4").display()
+-------------------------------------------
+ii)using display() method
+
+spark.sql("select * from dev.demodb.emp4").display()
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+-----------------------------------------------
+
+
+
+iii)using display() function
+
+display(spark.sql("select * from dev.demodb.emp4"))
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13

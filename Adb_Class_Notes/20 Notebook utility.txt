@@ -1,0 +1,105 @@
+
+==============================================================================
+2)Notebook utility:
+ -----------------
+
+------------------------
+dbutils.notebook.help()
+------------------------
+here we have only 2 methods
+1)exit(): returns a exit code from a notebook
+ exit(value: String): void -> This method lets you exit a notebook with a value
+
+2)run(): used to call a notebook from another notebook 
+          i.e one main notebook calling all other notebooks
+
+These allows you to create re-usable spark code and design a modular application
+
+ex:
+
+create a new notebook
+
+File-->New--->Notebook
+       Name : childnotebook
+
+---------------------------------
+print("I am a child Notebook!!!")
+---------------------------------
+in next cell ,I will exit from notebook and return a exit code
+
+--------------------------------
+dbutils.notebook.exit(101)
+--------------------------------
+o/p  notebook exited :101
+
+go back to previous parent notebook--->dbutilsnotebook
+
+Now i will call the child notebook using run() method
+
+----------------------------------------
+dbutils.notebook.run("./childnotebook",40)
+-----------------------------------------
+here am calling a child notebook from parent notebook
+
+run() takes 3 arguments
+1)full path of child notebook
+2)timeout in secs
+3)passing some values to child notebook
+
+in this ex am not passing any values to the child notebook
+
+once you excute-->
+Notebook workflow exexutes-->
+once suuceeded--->click that link--->it says what happened in the child notebook
+at the bootom u can see--->101 (i.e the exit code that we returned from the 
+                                 child notebook)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

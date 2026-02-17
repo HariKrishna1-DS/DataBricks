@@ -1,0 +1,140 @@
+
+
+#Delta Table instance:
+#  -To make replica to actual delta table
+
+#Advantage of instance: To perform sql operations using pyspark
+
+#syntax: DeltaTable.forName(spark,"tablename")
+
+==============================================================================
+
+----------------------------------------------
+#step 1: Creating delta table
+
+from delta.tables import *
+
+DeltaTable.create(spark) \
+     .tableName("dev.demodb.emp3") \
+     .addColumn("eid","INT") \
+     .addColumn("ename","STRING") \
+     .addColumn("sal","DOUBLE") \
+     .addColumn("sex","STRING") \
+    .addColumn("dno","INT") \
+    .execute()
+-----------------------------------------------
+Delta table is created
+
+#step 2: inserting data into Delta table
+-----------------------------------------------------------------------------
+%sql
+insert into dev.demodb.emp3 values (101,"Raj",50000,"M",11),(102,"Ravi",60000,"M",12),(103,"Suresh",70000,"M",13);
+------------------------------------------------------------------------------
+==============================================================================
+#step 3: Retrieving data
+---------------------------------------------
+%sql
+select * from dev.demodb.emp3;
+---------------------------------------------
+o/p:
+
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+
+==============================================================================
+Step 4: Creating instance for delta table
+
+deltainstance_emp3=DeltaTable.forName(spark,"dev.demodb.emp3")
+display(deltainstance_emp3.toDF())
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+
+========================================================================
+Step 5: Now perform operations both on table and instance
+
+%sql
+ describe dev.demodb.emp3;
+
+o/p:
+
+col_name	data_type
+eid	int
+ename	string
+sal	double
+sex	string
+dno	int
+
+#using pyspark-->describe the instance
+-------------------------------------------------
+display(deltainstance_emp3.toDF().printSchema())
+-------------------------------------------------
+o/p:
+root
+ |-- eid: integer (nullable = true)
+ |-- ename: string (nullable = true)
+ |-- sal: double (nullable = true)
+ |-- sex: string (nullable = true)
+ |-- dno: integer (nullable = true)
+===========================================================================
+%sql
+ describe  history dev.demodb.emp3;
+
+o/p: we get the entire history
+
+using pyspark --->describing history
+
+------------------------------------
+display(deltainstance_emp3.history())
+-----------------------------------
+o/p: we get the entire history
+=============================================================================
+step 6 :Deleting data from deltatable
+
+i)using sql
+--------------------------
+%sql
+delete from dev.demodb.emp3 where eid=103;
+---------------------------
+%sql
+select * from dev.demodb.emp3;
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+
+-------------------------------------------
+display(deltainstance_emp3.toDF())
+-------------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+
+if we are deleting, it will reflected in the instance also
+
+ii)using pyspark approach--deleting from the instance
+deltainstance_emp3.delete("eid=102")
+display(deltainstance_emp3.toDF())
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+
+==============================================================================
+
+---------------------------
+%sql
+select * from dev.demodb.emp3;
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+
+
+
+

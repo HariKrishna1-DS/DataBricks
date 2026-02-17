@@ -1,0 +1,238 @@
+
+
+Dataframe is a collection of Row objects,
+EAch row object repreents a record
+
+DataFrames can be created in 2 ways using
+1)spark session->ex:df=spark.createDataFrame(RDD) #here spark is spark session object
+2)sqlContext---->ex:df=sqlContext.createDataFrame(RDD)
+
+
+
+Creating Dataframes :4ways
+1)from local objects(python objects)
+2)from rdds(resilient distributed datasets)
+3)from the results of sql queries we get a DataFrame
+4)from External Datasources like CSV,json etc
+
+Creating Dataframe from local objects(python objects)
+
+------------------------------------------------------------------------------
+ex.1  Creating Dataframe from  list(local object)
+
+---------------------------------------------------
+x=[('Ajay',30),('Rahul',40)]
+df=spark.createDataFrame(x)
+df.show()
+---------------------------------------------------
+o/p:
++-----+---+
+|   _1| _2|
++-----+---+
+| Ajay| 30|
+|Rahul| 40|
++-----+---+
+
+----------------------------------------------------------------------------------------
+ex:2 Creating dataframe with schema
+
+x=[('Ajay',30),('Rahul',40)]
+df=spark.createDataFrame(x,['NAME','AGE'])
+df.show()
+
+o/p:
+
++-----+---+
+| NAME|AGE|
++-----+---+
+| Ajay| 30|
+|Rahul| 40|
++-----+---+
+
+
+==============================================================================
+3)df.count(): To count the no of rows in a DF
+
+df.count()
+o/p :2
+==============================================================================
+4)printSchema():
+
+df.printSchema()
+o/p:
+root
+ |-- NAME: string (nullable = true)
+ |-- AGE: long (nullable = true)
+
+==============================================================================
+4 different ways of providing schema
+
+1.while creatimg DF,providing schema (as shown above)
+
+2.using dictionary
+
+3.using Row object
+
+4.using Struct Type
+
+==============================================================================
+5)Using Dictionary Providing schema,creating DF
+
+x=[{'name':'Ajay','age':30},{'name':'Rahul','age':40,'city':'Pune'}]
+df=spark.createDataFrame(x)
+df.show()
+
+o/p:
++---+-----+----+
+|age| name|city|
++---+-----+----+
+| 30| Ajay|NULL|
+| 40|Rahul|Pune|
++---+-----+----+
+
+==============================================================================
+6)Creating a DF from a RDD
+
+x=[('Miller',25),('Ajay',30),('Blake',45)]
+#converting a python object to spark object(RDD) using-->parallelize() method
+ 
+rdd=sc.parallelize(x) #If we parallelize a python object we get a spark object(RDD)
+#Now creating a spark dataframe from a spark RDD
+df1=spark.createDataFrame(rdd,['Name','Age']) #providing schema while Creating DF
+df1.show()
+
+o/p:
++------+---+
+|  Name|Age|
++------+---+
+|Miller| 25|
+|  Ajay| 30|
+| Blake| 45|
++------+---+
+=============================================================================
+7)Creating a DataFrame from a Row object
+
+#creating a DF from a row object
+x=[('Miller',25),('Ajay',30),('Blake',45)]
+rdd=sc.parallelize(x)
+
+#Now providing schema to a RDD using Row object
+from pyspark.sql import Row
+customer=Row('Name','age')
+type(customer)
+cust=rdd.map(lambda p:customer(*p))
+cust.collect()  #returns a list of Row objects
+#Now creating  DF from the Row objects
+df=spark.createDataFrame(cust)
+df.show()
+
+o/p:
++------+---+
+|  Name|age|
++------+---+
+|Miller| 25|
+|  Ajay| 30|
+| Blake| 45|
++------+---+
+
+==============================================================================
+8)Providing Schema using StructType
+
+from pyspark.sql.types import *
+schema=StructType([
+      StructField('Name',StringType(),True),
+      StructField('age',IntegerType(),True)])
+df=spark.createDataFrame(rdd,schema)
+df.show()
+o/p:
++------+---+
+|  Name|age|
++------+---+
+|Miller| 25|
+|  Ajay| 30|
+| Blake| 45|
++------+---+
+==============================================================================
+9)shanging schema or colmumn names
+  change===>name to Empname
+            age to EmpAge
+
+df2=spark.createDataFrame(rdd,"Empname:string,EmpAge:int")
+df2.show()
+o/p:
++-------+------+
+|Empname|EmpAge|
++-------+------+
+| Miller|    25|
+|   Ajay|    30|
+|  Blake|    45|
++-------+------+
+==============================================================================
+10)converting a rdd to dataframe
+
+df=rdd.toDF()
+df.show()
+
++------+---+
+|    _1| _2|
++------+---+
+|Miller| 25|
+|  Ajay| 30|
+| Blake| 45|
++------+---+
+===============================================================================
+11)#creating emp records
+from pyspark.sql import Row
+x=[(101,'Miller',10000,'m',11),
+   (102,'Blake',20000,'m',12),
+   (103,'Clark',25000,'m',13),
+   (104,'James',15000,'m',14)]
+
+empsdf=spark.createDataFrame(x,['eid','ename','sal','sex','dno'])
+empsdf.show()
+
+o/p:
++---+------+-----+---+---+
+|eid| ename|  sal|sex|dno|
++---+------+-----+---+---+
+|101|Miller|10000|  m| 11|
+|102| Blake|20000|  m| 12|
+|103| Clark|25000|  m| 13|
+|104| James|15000|  m| 14|
++---+------+-----+---+---+
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

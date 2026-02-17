@@ -1,0 +1,88 @@
+Delta Table Updation
+---------------------------
+
+1. path="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/jsondata/emps.json"
+df=spark.read.json(path)
+df.show()
+
+
+O/P
+------------------
+
++---+---+------+-----+---+
+|dno|eid| ename|  sal|sex|
++---+---+------+-----+---+
+| 11|101|Miller|10000|  m|
+| 12|102| Blake|20000|  m|
+| 11|103|  Sony|30000|  f|
+| 12|104| Sonia|40000|  f|
+| 13|105| James|50000|  m|
++---+---+------+-----+---+
+
+
+2. df.write.format("delta").mode("overwrite").saveAsTable("dev1.demodb.emp")
+   spark.sql("select * from dev1.demodb.emp").display()
+
+
+O/P
+---------------
+dno	eid	ename	sal	sex
+11	101	Miller	10000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	50000	m
+
+
+3. 
+
+%sql
+
+--updating the delta table
+update dev1.demodb.emp set sal=sal+50000 where eid=101;
+select * from dev1.demodb.emp;
+
+
+O/P
+-----------------------
+dno	eid	ename	sal	sex
+11	101	Miller	60000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	50000	m
+
+
+4. #II-method :Pyspark style ----->using Table instance
+from pyspark.sql.functions import *
+from delta.tables import *
+deltatable_instance=DeltaTable.forName(spark,"dev1.demodb.emp")
+deltatable_instance.update(condition="ename='Miller'",set={"sal":"75000"})
+
+spark.sql("select * from dev1.demodb.emp").display()
+
+
+O/P
+-----------------
+
+dno	eid	ename	sal	sex
+11	101	Miller	75000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	50000	m
+
+
+5.
+deltatable_instance.update(condition=col("ename")=="James",set={"sal":lit(80000)})
+spark.sql("select * from dev1.demodb.emp").display()
+
+
+O/P
+
+dno	eid	ename	sal	sex
+11	101	Miller	75000	m
+12	102	Blake	20000	m
+11	103	Sony	30000	f
+12	104	Sonia	40000	f
+13	105	James	80000	m

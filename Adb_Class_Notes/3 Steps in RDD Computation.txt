@@ -1,0 +1,57 @@
+steps in RDD computation:
+-------------------------
+step 1: Initially all the RDDs are just declared
+        we load and execute them on demand by performing an action
+        when action is performed,flow execution will start from its root RDD
+        or availabe RDD
+        This process is called as Lazy Evolution
+
+step 2: During the flow execution,Each RDD partitions data will be loaded into 
+        RAms(memory) and computed in RAM
+        here RDDs will be loaded sequentially one after the another
+
+step 3:Once Rdd computation is finished,it waits for its next RDD,
+       if next RDD is ready then previous RDD will be removed from the Ram.
+       This process continues untill the flow or action is completed
+
+
+step 4::when action is performed,all RDDs are strored and computed at spark side
+       (i.e spark cluster machines)
+       but the final result that we get by performing action is collected and
+       stored in the client machine
+       client means the machine from where the job is submitted
+
+step 5:During the flow execution,the RDD whose o/p  is commonly used by
+       mutiple flows will be persisted
+
+step 6: Finally the RDD sored in RAM can be un-persisted if no longer required
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+ 
+          

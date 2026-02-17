@@ -1,0 +1,286 @@
+
+    AzureDAtabricks with Pyspark
+    ----------------------------
+
+ what is Databricks?
+
+ Databricks provides spark cluster
+
+ what is spark?--->in-memory computing
+                   MPP--->MAssive parallel processing
+
+ what is a cluster
+   Group of nodes(systems) connected in a network
+    There are 2 types of nodes
+      1.Driver node 
+      2.worker node
+
+      ex: if we have 20-node cluster in that
+          one will be the driver and
+          all the remaining will be the worker nodes
+
+      Data will be distributed across multiple worker nodes and is
+      executed by multiple worker nodes parallely
+
+    spark is 100times faster than normal disk processing
+
+
+   Assume a cluster with 100 nodes
+
+   This 100 nodes cluster is worthy processing 1TB of data at a time
+
+   Tommorrow--->UR data volume increased by huge amount
+   if same cluster is used---->speed goes down
+
+   To achieve high speed
+
+   Solution :Scaling up the the cluster---->by adding 50 new nodes
+
+   after 1 month,again data increased and again 50 new nodes added
+
+   Everytime scaling up your physical data center is a complex task
+
+  so the solution---->same cluster in the cloud  and that too
+                      with auto scaling features
+
+  who is providing this---->Databricks
+
+   Databricks provides spark cloud cluster with auto-scaling feature
+
+
+  Today---->my organization--->dataload---->requires 100 nodes
+
+  Tommorrow--->Data Volume increased--->It has to be extended to 200 automatically
+ 
+  and again after pocessing is completed, it has to revert back to 100 nodes
+
+  This is General Databricks
+  
+  General Databricks is not compatible with all the Azure storages
+
+  Azure storage services are:
+  1)Azure Datalake
+  2)Azure sql
+  3)Azure cosmosdb etc
+
+  That's why  Microsoft + Databricks collaboratively they launched a
+  new product called as Azure Databricks(ADB)
+
+
+  Azure Databricks(ADB)
+     -It is a spark cluster with autoscaling and compatible
+      with all the Azure data storage services
+
+ For normal databrick,we need to do lot of other settings
+     we need to call different API's
+
+ Databricks is not aonly for Azure,but also available for AWS and Google
+
+ In Databricks---->who is processing the data---->spark
+
+ So Azure Databricks is a spark-based Data Analysics platform
+
+ Apache Spark is an
+                   -open source
+                   -Distributed cluster computing framework
+                   -with in-memory computing feature in
+                   -parallel process style
+                   -used for large scale Data processing
+
+==============================================================================
+
+
+Yahoo---->Table--->100TB---->1024cols
+
+          Task :Sorting based on 16cols
+
+Time Taken by
+
+1)Oracle---->3.5days
+2)mysql----->6days
+3)Teradata-->4.5hrs
+4)Netezza--->3hrs
+5)Hadoop --->3.4mins
+
+Spark is 100times faster than Hadoop(MR)
+
+===============================================================================
+Spark:
+-----
+
+Evolution of Spark:
+
+ -Spark was developed by Matei Zaharia in AMP lab,Berkeley in the year 2009.
+ -spark was opensourced in the year 2010
+ -Spark was dontated to Apache s/w Foundation in the year 2013.
+
+==============================================================================
+Defining spark
+
+Spark is a
+          -Distributed Execution Framework in
+          -parallel process style with
+          -in-memory computing feature
+          -used for large-scale data processing
+
+In-Memory computation :Here data gets loaded into Ram and gets processed
+                       within Ram,
+                       here data divided into partitions and the partitions
+                       are distributed across multiple rams of multiple worker 
+                       machines and are processed parallely
+
+==============================================================================
+Spark can be coded with
+                       -Scala(default)
+                       -python
+                       -Java
+                       -R-Language
+
+Spark by default written in scala language
+
+But in ADB, Java is not supported
+
+=============================================================================
+Spark compared with other Execution models
+
+Execution Generations
+1.MapREduce(Hadoop)
+2.Tej
+3.spark
+
+1.Tej Vs Spark
+         -Both follows DAG(Directed-Acyclic Graph) model
+         -Tej doesnt follow in-memory computation but spark is a in-memory
+          computing system
+          so spark has got very high speed as compared to Tej
+
+------------------------------------------------------------------------------
+other in-memory computing systems in the market--------->HANA
+
+HANA Vs Spark
+
+          -Both follows in-memory computing
+           But HANA is not distributed
+           but spark has a distributed RAM
+==============================================================================
+
+Spark is mainly designed for 
+                           1)Batch Applications
+                           2)Iterative Algorithms
+                           3)Interactive Queries
+                           4)Streaming
+
+==============================================================================
+3)MapReduce(Hadoop)  Vs Spark
+
+MapReduce Drawbacks:
+-------------------
+1)Transformations cannot be re-used
+2)Bad for Iterative algorithms
+3)Not a flexible parallel process
+4)Slow Processing 
+
+==============================================================================
+4)Apache Pig Vs  Apache Spark
+   
+   -Both are Dataflow Languages
+   -But in pig, the entire Dataflow is converted into 1 MapReduce Job
+    but again MapReduce is bad
+
+==============================================================================
+5)Apache Spark VS Apache Flink
+
+ in the intial versions of spark, spark was weaker in terms of Data Analytics
+ i.e MAchine LEarning, but machine learning is the heart of Data Analytics
+ but from spark 1.6 version onwards spark introduced powerfull libraries
+ for ML,Graph,streaming and for interactive queries
+
+ before spark 1.6----->spark < Flink
+ from   spark 1.6----->spark ==Flink
+ from   spark 2.0----->spark > Flink
+
+==============================================================================
+Spark Features:
+
+1)In-Memory computation
+2)Distributed Execution
+3)Flexible parallel process
+4)Good for Iterative Algorithms
+5)Flexible parallel process
+6)MPP-->massive parallel process
+7)Transformations can be re-used
+8)Very High Speed
+9)Multi-Language support
+10)Supports Advanced analytics for
+  (ML Algorithms,Graph algorithms,streaming,interactive queries etc)
+
+11)Lazy Evoluted
+12)Persistence --->reusing already executed Transformation
+13)Powerfull Fault-Tolerant model
+14)immutable
+
+==============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+  
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+     
+ 

@@ -1,0 +1,77 @@
+
+Databricks Lakehouse Platform
+-----------------------------
+Physical layer:
+---------------
+-This Architecture is designed with multiple layers
+
+-The bottom most layer(ADLS)------->is the physical storage layer
+
+ is created using ADLS storage account, in which we create containers
+
+-In physical layer data go and sit in files
+ data will sit into the containers
+------------------------------------------------------------------------------
+logical layer:
+-------------
+on top of this physical layer,we can have one or more logical storage objects
+there are nothing but the schemas(databases)
+
+within databases--->we can have tables
+------------------------------------------------------------------------------
+Unity Catalog:
+--------------
+This logical storage layer is managed with a Data Governance solution
+
+In Databricks,the Data Governance solution is Unity Catalog
+
+on top of logical layer--->we have Unity Catalog layer
+
+any user/application like sparkapp which needs to read data from this
+physical layer will come through unity catalog and need to pass through 
+unity catalog and then access logical layer and internally reads data from
+the physical layer
+
+If the sparkapp produces o/p and to save this output should pass through 
+this unity catalog and access the logical layers and stores data in logical
+layers but physically stored in physical layer
+
+-so all the sparkapps which are running on the databricks cluster will have
+ to pass through unity catalog for reading data or writing data and we can also
+ grant privilages/permissions and access control managemant from unity catalog
+------------------------------------------------------------------------------
+Databricks cluster:
+------------------
+  -on top of unity catalog ,we have Databricks cluster
+
+  in cluster we have spark applications running and these notebooks will 
+  pass through this unity catalog to access the data
+
+-------------------------------------------------------------------------------
+Databricks Workspace:
+  -for creating clusters,running applications or deploying applications
+   we need to do from databricks workspace
+
+  Databricks workspace is the place where the endusers,developers or QA people
+  or a team can work 
+  ur team sitting at the top they will access the entire layers through workspace
+
+  -To access we create clusters and write spark code within the cluster and the
+   code passes through unity catalog and can access the data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

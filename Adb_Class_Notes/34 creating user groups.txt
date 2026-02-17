@@ -1,0 +1,53 @@
+
+creating user groups:
+----------------------
+
+-Creating user groups and creating objects and granting privilages to the
+ user groups or individual users
+
+-how to create user groups??
+
+-Goto databricks account console--->
+ click--->"user management"---->here we see--->1)users
+                                               2)groups
+
+ click groups->we see default group->account users -->in this we see members(3)
+                                                      all the members are part
+                                                      of the group
+ click--->add group--->
+          Group Name:adb9am-dev--->save
+          (we can create as many groups)
+
+---------------------------
+Now adding members to the group
+
+Goto-->Groups\adb9am-dev---> click "members"--->click--->"Add members"
+
+------->search : vijay --->click "add"
+
+we see the following
+ user,group         Type
+    vijay            user
+
+add one more user
+click--->"add members"
+ search:sagar  --->add
+
+2 members got added
+
+we are done with unity catalog side
+
+upto now--->
+          -how to setup our storage layer
+          -and created unity catalog metastore
+          -and connected untity catalog with our workspace
+          -and adding users/user groups to unity catalog
+
+
+
+
+
+
+
+
+

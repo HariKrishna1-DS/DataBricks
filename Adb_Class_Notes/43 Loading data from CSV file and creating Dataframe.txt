@@ -1,0 +1,98 @@
+Loading data from CSV file and creating Dataframe
+
+
+mystoragelakeadb9am--->containers-->dbfscontainer-->
+                    +upload--->csvdata/emp.csv
+
+----------------------------------------------------------------------
+base_dir="abfss://dbfscontainer@mystoragelakeadb10am.dfs.core.windows.net/"
+empsdf=spark.read.csv("base_dir+"csvdata/emp.csv"))
+empsdf.show()
+---------------------------------------------------------------
+o/p:
++---+------+------+---+---+----+
+|Eid| Ename|Salary|sex|dno|city|
++---+------+------+---+---+----+
+|101|Miller| 10000|  m| 11| hyd|
+|102| Blake| 20000|  m| 12|pune|
+|103|  Sony| 30000|  f| 11| hyd|
+|104|  Sita| 40000|  f| 12|pune|
+|105|  John| 50000|  m| 13| hyd|
++---+------+------+---+---+----+
+
+#or
+df=spark.read.format("csv").option("header",True).load("base_dir+"csvdata/emp.csv")
+df.show()
+
+o/p:
++---+------+------+---+---+----+
+|Eid| Ename|Salary|sex|dno|city|
++---+------+------+---+---+----+
+|101|Miller| 10000|  m| 11| hyd|
+|102| Blake| 20000|  m| 12|pune|
+|103|  Sony| 30000|  f| 11| hyd|
+|104|  Sita| 40000|  f| 12|pune|
+|105|  John| 50000|  m| 13| hyd|
++---+------+------+---+---+----+
+
+==============================================================================
+Reading multiple csv files at a time(merging)
+
+------------------------------------------------------
+df=spark.read.csv(["base_dir+"csvdata/emp.csv","base_dir+"csvdata/emp4.csv"],header=True)
+df.show()
+------------------------------------------------------------------
+o/p:
++---+------+------+---+----+----+
+|Eid| Ename|Salary|sex| dno|city|
++---+------+------+---+----+----+
+|101|Miller| 10000|  m|  11| hyd|
+|102| Blake| 20000|  m|  12|pune|
+|103|  Sony| 30000|  f|  11| hyd|
+|104|  Sita| 40000|  f|  12|pune|
+|105|  John| 50000|  m|  13| hyd|
+|101|Miller| 10000|  m|  11| hyd|
+|102| Blake| 20000|  m|  12|NULL|
+|103|  Sony|  NULL|  f|NULL| hyd|
+|104|  Sita| 40000|  f|NULL|pune|
+|105|  John|  NULL|  m|  13|NULL|
++---+------+------+---+----+----+
+============================================================================
+Reading all the csv files in a directory(assume 10 csv files)
+
+syntax: df=spark.read.csv("folderpath")
+
+--------------------------------------------------
+df=spark.read.csv("base_dir+"csvdata/",header=True)
+df.show()
+---------------------------------------------------
+o/p:
+
++---+------+------+---+----+----+
+|Eid| Ename|Salary|sex| dno|city|
++---+------+------+---+----+----+
+|101|Miller| 10000|  m|  11| hyd|
+|102| Blake| 20000|  m|  12|pune|
+|103|  Sony| 30000|  f|  11| hyd|
+|104|  Sita| 40000|  f|  12|pune|
+|105|  John| 50000|  m|  13| hyd|
+|101|Miller| 10000|  m|  11| hyd|
+|102| Blake| 20000|  m|  12|NULL|
+|103|  Sony|  NULL|  f|NULL| hyd|
+|104|  Sita| 40000|  f|NULL|pune|
+|105|  John|  NULL|  m|  13|NULL|
+
+
+
+
+
+
+
+
+===============================================================================
+
+
+
+
+
+

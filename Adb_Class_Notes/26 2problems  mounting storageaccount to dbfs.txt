@@ -1,0 +1,40 @@
+
+
+
+2problems---> mounting storageaccount to dbfs
+
+1)am exposing all the details like
+       clientid(applicationid)
+       tenantid(directoryid)
+       client secret key
+
+solution: databricks gives approach  to secure
+          -we can create Azure vault in Azure cloud account and secure all
+           these in  Azure vault  and from databricks we can pull the data
+           from the vault
+
+           Instead of hard-coding these-->secrets,clientid,tenantid
+           we can pull from vault
+
+          how to pull secrets from the vault
+          the 4th line in mount configs-->
+          dbutils.secrets.get(scope="<scope-name>",key="<service-credential-key-name>")
+
+2nd problem is--->once directory is mounted
+                  %fs ls /mnt/myfiles/sampledata
+                   This directory is available to all the users who have
+                   access to this workspace
+                   if yo want to cotrol this access
+                   we need to goto azure portal and restrict
+
+so thats why dbfs is not recommended to set up your data directory
+bcoz of fine-grain access control
+
+
+============================================================================= 
+
+
+
+
+
+

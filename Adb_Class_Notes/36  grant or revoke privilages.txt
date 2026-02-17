@@ -1,0 +1,36 @@
+
+Grant/revoke privilages to diff objects in unity catalog
+
+---------------------------------------------------------
+%sql
+Grant USE CATALOG  on catalog DEV to  `adb9am-dev`;
+GRANT ALL PRIVILEGES ON DATABASE dev.demodb TO `adb9am-dev`
+------------------------------------------------------------
+dont execute
+`--->tilde symbol
+here 'adb9am-dev' is the user group
+DEV is the catalogname
+The above stmt grants all privilages on demodb database
+
+Goto-->Catalog explorer-->dev catalog--->demodb database---->
+click permissions--->no permissions as of now
+here we have-->Grant-->we can also grant privilages from the UI side
+
+Now Execute the above 2 commands now--->
+
+Goto Catalog explorer--->refresh-->
+click dev-->demodb--->permissions--->we see
+
+principal        privilage
+adb9am-dev       ALL privilages
+
+--------------------------------------------
+If you want to revoke it
+revoke-->to remove the granted permissions
+in permissions-->select adb9am-dev--->click revoke
+
+
+revoke can be done using writing code --->similar to grant command
+
+
+This is how to give privilages on catalogs and databases

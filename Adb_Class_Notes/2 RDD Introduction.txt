@@ -1,0 +1,156 @@
+RDDs(Resilient Distributed Datasets)
+
+-Spark Data objects are called RDDs
+
+-Rdds are sub-divided into partitions
+
+-These partitions are distributed across multiple RAMS of multiple worker nodes
+
+-RDD Programming style is "Dataflow"
+
+-Dataflow is a sequence collection of pipes
+
+-A Pipe is a data operation such as
+                                    -loading data
+                                    -Transforming data
+                                    -filtering data
+                                    -grouping data
+                                    -merging data etc
+
+-In spark Dataflow is executed in sequence i.e RDD by RDD(one after the another)
+ with in-memory computing feature and persistence feature
+
+-But if a RDD has 30 partitions,then all the 30 partitions can execute in parallel
+
+============================================================================
+On a RDD, 2 types of operations can be performed
+1)Transformations
+2)Actions
+
+1)Transformations : 3Types
+i)Each Element Transformation
+  ex: map(),flatMap()
+  ex: if 1 Lakh employees, then adding 5000 to the sals of each employeei
+  ex:2 if 1 lakh employees,Transforming each each employee name to start with uppercase
+  ex: Rdd.map(.....)
+      Rdd.flatMap(.....)
+      
+ii)Filter Transformation :Filter based on a condition
+         ex: filter()
+         ex:filter based on city or product or department
+
+iii)Aggregated Transformation:
+         ex: groupByKey(),reduceByKey()  
+         for grouping and aggregation
+
+=============================================================================
+2)Actions : when an action is performed on a RDD, then only the dataflow will
+            be executed from the root RDD or from persisted RDD
+            
+
+some of the actions are:
+i)collect():It will collect all the partitions of different slave  machines
+            into client machine
+            ex: Rdd.collect()
+
+ii)count() : no.of elements in a RDD
+             ex: Rdd.count()
+
+iii)Take(n): takes the first 'n' no of elements in  a RDD
+             It is similar to limit in sql
+            ex: RDD.take(10)
+                means taking 1st 10 records
+                if partition1 has only 5 records
+                it takes 5 records from partition2
+
+iv)saveAsTextFile():storing the result into a file
+
+==============================================================================
+At each Rdd,transformaton or filter will be done to the data
+
+
+Note:i)If we perform Transformation on a RDD, the resultant we get is also
+        a RDD(spark object)
+  ii)If we perform action on a RDD,the resultant is a local object(python object)
+
+ex: RDD1.Transformaton()--->returns a RDD(spark object)
+    RDD1.action()---------->returns a python object
+
+   RDD1=sc.textfile("filepath")
+
+   RDD2=RDD1.map("......")
+
+   RDD3=RDD2.filter("......")
+
+   RDD4=RDD3.map(".......")
+  
+   RDD5=RDD4.groupByKey(".....")
+
+   res=RDD5.collect() #here res is python object like list
+
+   here the final result(res) is collected and stored into clientt machine
+
+   file---->RDD1----->RDD2---->RDD3---->RDD4----->RDD5 
+   RDD5.collect()--->the flow executes from RDD1 to RDD5 and RDD5 o/p is collected
+   if RDD4.collect()->the flow executes from RDD1 to RDD4 and RDD4 o/p is collected
+
+   Before action is performed--->how many RDDS in the RAM--->0
+   After action is performed and executed->how many RDDs in RAM->0
+
+  whenever we perform action then one by one RDD will be loaded and computed
+  once a RDD is computed then the previous RDD and its partition will be 
+  removed from the RAM.
+  
+
+  To know the no of partitions--->Rdd.getNumpartitions()
+
+ RDD1,RDD2,RDD3,RDD4,RDD5--->will all these will have same no of partitions->No
+
+ RDD1(50L Recs)----------------------------->20partitions
+ RDD2=RDD1.filter(city="hyd")->o/p->1L Recs->5partitions
+
+ No of workers nodes---->40
+ but no of partitions----->80
+ then each woker node--->we see 2 partitions
+
+ only 1 worker--->if 5 partitions than all the partitions stored in a single worker
+ then single worker executes one by one --->sequentially-->No parallel proces
+------------------------------------------------------------------------------
+1Q) What is Lazy Evolution in Spark
+    The Dataflow will be executed only when an action is performed
+    This is called as Lazy evolution
+
+2Q)What are the situations where RDD will be removed from the RAM(memory)
+   2situations
+   1.when next RDD is ready,previous RDD will be removed from the Ram
+   2.when action or execution is completed,last RDD will be removed from the RAM
+
+3Q)What are the different ways to persist an RDD
+    2ways
+    1.Rdd.persist()
+    2.Rdd.cache()
+4Q)what are the various persist options
+
+5Q)Generally which RDD will be persisted
+   The RDD whose output is used by many other flow that RDD will be persisted
+
+6Q)Different ways to upersist an RDD
+   1.Forcefully unpersisting by saying--->Rdd.unpersist()
+   2.when session is closed
+   3.when server shutdowns
+7Q)Rules to be follwed in RDD persistence
+
+================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+

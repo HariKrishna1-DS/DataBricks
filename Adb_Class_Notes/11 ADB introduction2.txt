@@ -1,0 +1,58 @@
+
+
+workspace can interact with----->1)Azure Datalake
+                                 2)Azure Sql
+                                 3)Azure Cosmosdb
+                                 4)Azure Synapse
+
+
+ADB imlementations can be used in----->ADF
+                                      -PowerBI
+                                      -Azure Streaming
+                                      -Azure ML
+
+
+Databricks Serversless: The code we write in python,
+                        It is going to executed on spark cluster
+               If we use ADB service--->No need to worry of Infrastructure
+               Depending upon load, it will scale-in and scale out 
+
+===============================================================================
+ResourceGroup(ADB_RG)--->
+within the Resource Group->we can have multiple workspaces
+within the workspace--->we can have multiple clusters
+within a cluster---->we can have multiple notebooks
+
+
+REsource Group:---->we can have muliplr workspaces,clusters and notebooks
+
+workspace :allows multiple users to work simulataneously in a single session
+            users can be datascientists,DataEngineers ,DataAnalysts and
+            database architects           
+             all these people can work in a single workspace
+==============================================================================
+Cluster :Group of nodes(systems) connected in a network
+         There are 2 types of nodes
+          1)Driver node(master node)
+          2)workernode(slave node)
+
+Cluster has single Driver node and multiple worker nodes
+===============================================================================
+Notebook: It is a user interface to write code in python,scala etc
+
+Generally
+        In ADF, we work with pipelines
+        In ADB, we work with Notebook
+
+#==============================================================================
+
+
+
+
+
+                         
+
+
+
+
+

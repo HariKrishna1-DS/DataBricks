@@ -1,0 +1,53 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Q)what are the situations where RDD will be removed from the Ram(memory).,
+Ans) 1.whenever next RDD is ready, previous RDD will be removed from the RAM
+        2.when action or execution is completed, last RDD will be removed from the RAM.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+Q)Different ways to persist an RDD ?
+Ans) 2ways
+        i)RDD.persist( )
+       ii)RDD.cache( )
+-----------------------------------------------------------------------------------------------------------------------------------------------
+Q)Different ways to unpersist an RDD?
+Ans) 1)Forcefully unpersisting by saying RDD.unpersist()
+         2)when session is closed
+         3)when server shutdowns
+----------------------------------------------------------------------------------------------------------------------------------------------
+Q)Generally which RDD will be persisted?
+Ans)The RDD whose o/p is commonly used by multiple flows that RDD will be persisted
+ 
+---------------------------------------------------------------------------------------------------------------------------------------------
+Q)what is Lazy Evolution in spark?
+Ans) Executing the dataflow on demand whenever action is performed ,such kind of evolution we call it as 
+        Lazy evolution. 
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+Steps in RDD Computation:
+
+step 1: Initially all the RDDs are just declared, they are not strored anywhere or not computed,
+           we load and execute them on demand by performing an action.
+            when action is performed, flow execution will start from its root RDD (or) available RDD in RAM
+
+step2: During flow Execution, Each RDD partitions data will be loaded into RAms and computed in
+       RAM.
+          here RDDs will be loaded sequentially one after the another,
+
+step3 :Once RDD computation is finished,it waits for its next RDD . 
+       If next RDD is ready then previous RDD will be removed from the RAM.
+       This process continues untill the action is completed.
+
+step 4:when action is performed, all RDDs are stored and computed at 
+       spark side(i.e in spark cluster machines)
+       but the final result that we get by performing action is collected and 
+       stored in the client machine.
+           client means the machine from where the job is submitted.
+
+step 5: During the flow execution, the RDD o/p which is commonly used by
+        multiple flows will be persisted.
+
+step 6: Finally the RDD stored in RAM can be unpersisted if it is no 
+        longer required.
+
+
+

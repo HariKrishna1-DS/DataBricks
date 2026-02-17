@@ -1,0 +1,255 @@
+
+
+Different ways on inserting data into delta table
+
+I-method : SQL Style insert
+
+Step 1: Create Delata Table
+
+----------------------------------
+from delta.tables import *
+
+DeltaTable.create(spark) \
+     .tableName("dev.demodb.emp4") \
+     .addColumn("eid","INT") \
+     .addColumn("ename","STRING") \
+     .addColumn("sal","DOUBLE") \
+     .addColumn("sex","STRING") \
+    .addColumn("dno","INT") \
+    .execute()
+--------------------------------------
+
+Step 2: inserting data(sql style)
+
+---------------------------------------------
+%sql
+insert into dev.demodb.emp4 values (101,"Raj",50000,"M",11),(102,"Ravi",60000,"M",12),(103,"Suresh",70000,"M",13);
+---------------------------------------------
+=========================================================================
+Step 3: Retrieving data
+1)sql style
+----------------------------
+%sql
+select * from dev.demodb.emp4;
+------------------------------
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+
+2)pyspark style
+  -------------
+spark.sql("select * from dev.demodb.emp4").show()
++---+------+-------+---+---+
+|eid| ename|    sal|sex|dno|
++---+------+-------+---+---+
+|101|   Raj|50000.0|  M| 11|
+|102|  Ravi|60000.0|  M| 12|
+|103|Suresh|70000.0|  M| 13|
++---+------+-------+---+---+
+o/p:
+3)spark.sql("select * from dev.demodb.emp4").display()
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+
+4)display(spark.sql("select * from dev.demodb.emp4"))
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+
+==============================================================================
+II-method : Dataframe insert
+
+Step 1: creating or defining schema-->multiple ways
+
+I-way
+schema1="""eid int,
+           ename string,
+           sal double,
+           sex string,
+           dno int"""
+or
+
+#II-way
+from pyspark.sql.types import *
+#Or
+from pyspark.sql.types import StructType,StructField,IntegerType,StringType,DoubleType
+schema2=StructType([
+         StructField("eid",IntegerType(),False), \
+         StructField("ename",StringType(),True), \
+         StructField("sal",DoubleType(),True), \
+         StructField("sex",StringType(),True), \
+         StructField("dno",IntegerType(),True) \
+         ])
+
+#here True--->means nullable is True
+
+--------------------------------------------------------------------------- 
+#Step 2: Defining data
+data1=[(104,"Rajesh",40000.00,"M",13),(105,"Ramesh",50000.00,"M",12)]
+
+#step 3:creating dataframe
+df1=spark.createDataFrame(data=data1,schema=schema2)
+#or
+#df1=spark.createDataFrame(data1,schema2)
+
+#step 4:appending data to existing table using append mode
+df1.write.format("delta").mode("append").saveAsTable("dev.demodb.emp4")
+#or
+df1.write.format("delta").mode("overwrite").saveAsTable("dev.demodb.emp4")
+here overwrite means-->oberwrites the existing data 
+append means-->appending new data to the existing data
+
+#step 5: Retrieving data
+
+----------------------------
+%sql
+select * from dev.demodb.emp4;
+------------------------------
+
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+105	Ramesh	50000	M	12
+
+----------------------------------------------------------------------------
+III-method:  Dataframe insertInto() method
+
+step 1: define schema 
+from pyspark.sql.types import *
+#Or
+from pyspark.sql.types import StructType,StructField,IntegerType,StringType,DoubleType
+schema2=StructType([
+         StructField("eid",IntegerType(),False), \
+         StructField("ename",StringType(),True), \
+         StructField("sal",DoubleType(),True), \
+         StructField("sex",StringType(),True), \
+         StructField("dno",IntegerType(),True) \
+         ])
+--------------------------------------------------------------------
+step 2: create dataframe
+
+
+data1=[(106,"Pavan",60000.00,"M",11),(107,"Suresh",70000.00,"M",12)]
+#creating dataframe
+df1=spark.createDataFrame(data=data1,schema=schema2)
+display(df1)
+
+eid	ename	sal	sex	dno
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+-----------------------------------------------------------------------------
+step 3: inserting---->using insertInto() method
+#inserting data to existing table using insertInto
+df1.write.insertInto("dev.demodb.emp4",overwrite=False)
+
+#retrieving data
+%sql
+select * from dev.demodb.emp4;
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+105	Ramesh	50000	M	12
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+==============================================================================
+IV-method : Insert using Temp view
+
+df1.createOrReplaceTempView("delta_temp_table")
+
+syntax:insert into table select * from tempview
+
+------------------------------------------------------
+%sql
+select * from delta_temp_table
+------------------------------------------------------
+o/p:
+eid	ename	sal	sex	dno
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+
+-----------------------------------------------
+%sql
+insert into dev.demodb.emp4
+select * from delta_temp_table
+-----------------------------------------------
+o/p:
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+105	Ramesh	50000	M	12
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+
+==============================================================================
+V method : spark sql insert
+
+---------------------------------------------------------------------
+spark.sql("insert into dev.demodb.emp4 select * from delta_temp_table")
+
+----------------------------------------------------------------------
+
+%sql
+select * from dev.demodb.emp4;
+
+o/p:
+eid	ename	sal	sex	dno
+101	Raj	50000	M	11
+102	Ravi	60000	M	12
+103	Suresh	70000	M	13
+104	Rajesh	40000	M	13
+105	Ramesh	50000	M	12
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+106	Pavan	60000	M	11
+107	Suresh	70000	M	12
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

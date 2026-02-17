@@ -1,0 +1,193 @@
+
+Creating metastore objects:
+--------------------------
+
+Creating metastore objects like--->databases
+                                  tables
+                                   views
+                                  functions
+                                  volumes and use it  within unity catalog
+
+
+Working with Unity Catalog:
+---------------------------
+Goto workspace
+open a seperate notebook--->rename as-->"metastore objects"
+
+clean up the previous runs-->by running the cleanup script
+
+----------------------------
+%run ../utils/cleanup --->This cleanup script will clean up the previous runs
+----------------------------
+
+It is recommended to run cleanup--->before you proceed
+
+In Unity Catalog---->the 1st level of object we create is--->Catalog
+
+we create catalog and 
+inside this catalog,we create
+                             -databases
+                             -tables
+                             -functions
+                             -views
+                             -volumes
+
+Usually we create catalogs for environments or for projects
+
+ex:
+You have a project
+    -You want to create 2 catalogs-->1)DEV catalog
+                                     2)QA catalog
+
+-------------------------
+CREATE CATALOG DEV;
+-------------------------
+or for safety
+
+-------------------------
+%sql
+CREATE CATALOG IF NOT EXISTS DEV;
+CREATE CATALOG IF NOT EXISTS QA;
+---------------------------------
+
+dont execute this
+
+First check the--->Catalog Explorer
+we see 4 catalogs mainly
+1)System catalog--->click-->
+                    owner---->system user
+                     IT is created automatically for new unity catalog
+                     information schema-->click
+                     within this we see lot of metadata tables
+
+
+2)main catalog
+      -default  (database/schema)
+      information schema
+
+3)samples catalog---->owned by Databricks--->automatically created
+
+4)hive_metastore catalog
+  -This is not a unity catalog
+  -This is workspace local catalog
+
+  -IF you doesnt have unity catalog setup for ur workspace,
+     you will have hive_metastore catalog
+
+  -Once you setup unity catalog
+        -we can create new catalogs using unity catalog
+
+         otherwise we will have local workspace catalog i.e hive_metastore
+  in hive_metastore,
+     whatever objects we create will sit in hive_metastore,which we cannot
+     share across multiple workspaces,
+
+==============================================================================
+Now creating 2 new catalogs
+  
+-------------------------
+%sql
+CREATE CATALOG IF NOT EXISTS dev;
+CREATE CATALOG IF NOT EXISTS qa;
+---------------------------------
+run this cell-->ok
+
+Goto catalog explorer-->refresh
+
+we see 2 new catalogs--->1)dev
+                         2)qa
+
+Click-->dev catalog
+          -default (database/schema)
+          -information_schema  -->These 2 we will see in any new catalog we create
+
+Click-->qa catalog
+          -default (database/schema)
+          -information_schema
+
+we can also drop this default database
+-----------------------------------------------------------------------------
+Creating a database in dev catalog
+
+-----------------------------------------
+CREATE DATABASE IF NOT EXISTS dev.demodb
+-----------------------------------------
+
+here dev-->is the catalogname
+  demodb-->is the databasename
+
+if i have a customer table in the database-->how to refer->
+catlogname.databasename.tablename
+dev.demodb.customer
+
+Even we can drop default database from QA catalog
+
+--------------------------------
+%sql
+drop database if exists qa.default
+----------------------------------
+
+it gets dropped
+
+in this way we can write code to create unity catalog objects (or)
+we can create catalogs/schemas/databases through UI also
+
+Goto-->Catalog explorer-->goto qa catalog-->click "create schema" to create
+       new schema/database
+
+
+we can also create catalogs from UI
+
+click--->dev catalog--->catalog explorer(right side)--->catalogs-->"create catalog"
+
+so we can perform from UI (or) through script by writing code
+
+=============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
